@@ -46,20 +46,17 @@ BaseNode::BaseNode(rclcpp::Node::SharedPtr node) :
   vision_detection_publisher_(node_->create_publisher<VisionDetectionMsg>("vision_detection", rclcpp::QoS(4).best_effort())),
   map_enable_(node_->declare_parameter<bool>("map.enable", true)),
   receiver_(node_->create_wall_timer(10ms, std::bind(&BaseNode::receive, this)))
-  {
-    udp_socket_.bind(QHostAddress::AnyIPv4, 10009);
-    udp_socket_.joinMulticastGroup(QHostAddress("224.5.23.2"));
-    udp_socket_.abort();
-    udp_socket_.bind(QHostAddress::AnyIPv4, 10006);
-    udp_socket_.joinMulticastGroup(QHostAddress("224.5.23.2"));
+{
+  udp_socket_.bind(QHostAddress::AnyIPv4, 10006);
+  udp_socket_.joinMulticastGroup(QHostAddress("224.5.23.2"));
 
-    map_msg_.info.resolution = node_->declare_parameter<double>("map.resolution", 0.01);
-    map_wall_width_ = node_->declare_parameter<double>("map.wall_width", 0.1);
+  map_msg_.info.resolution = node_->declare_parameter<double>("map.resolution", 0.01);
+  map_wall_width_ = node_->declare_parameter<double>("map.wall_width", 0.1);
 
-    if(map_enable_) {
-      map_publisher_ = node_->create_publisher<MapMsg>("map", rclcpp::QoS(4));
-    }
+  if(map_enable_) {
+    map_publisher_ = node_->create_publisher<MapMsg>("map", rclcpp::QoS(4));
   }
+}
 
 void BaseNode::receive()
 {
