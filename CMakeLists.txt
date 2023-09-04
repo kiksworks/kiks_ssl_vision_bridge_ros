@@ -32,11 +32,11 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 # set source files
-file(GLOB_RECURSE src_files 
-  LIST_DIRECTORIES false 
+file(GLOB_RECURSE src_files
+  LIST_DIRECTORIES false
   "src/${PROJECT_NAME}/*")
 
-file(GLOB app_files 
+file(GLOB app_files
   LIST_DIRECTORIES false
   RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/src
   "src/*")

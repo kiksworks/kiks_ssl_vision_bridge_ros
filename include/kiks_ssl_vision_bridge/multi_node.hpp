@@ -1,21 +1,27 @@
-// Copyright 2023 KIKS.
+// Copyright 2023 KIKS
 //
-// Licensed under the GNU GENERAL PUBLIC LICENSE, Version 3.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-//     https://www.gnu.org/licenses/gpl-3.0.html
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef KIKS_SSL_VISION_BRIDGE_MULTI_NODE_HPP_
-#define KIKS_SSL_VISION_BRIDGE_MULTI_NODE_HPP_
+
+#ifndef KIKS_SSL_VISION_BRIDGE__MULTI_NODE_HPP_
+#define KIKS_SSL_VISION_BRIDGE__MULTI_NODE_HPP_
 
 #include <list>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "kiks_ssl_vision_bridge/ros_node_base.hpp"
 
@@ -26,7 +32,7 @@ template<class BaseNode>
 class MultiNode : public RosNodeBase
 {
 public:
-  MultiNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions())
+  explicit MultiNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions())
   : MultiNode(std::make_shared<rclcpp::Node>(BaseNode::default_name(), options))
   {
   }
@@ -44,7 +50,7 @@ public:
   {
   }
 
-  MultiNode(rclcpp::Node::SharedPtr node)
+  explicit MultiNode(rclcpp::Node::SharedPtr node)
   : RosNodeBase(std::move(node))
   {
     this->add_parameter<std::vector<std::string>>(
@@ -61,4 +67,4 @@ private:
 
 }  // namespace kiks::ssl_vision_bridge
 
-#endif  // #ifndef KIKS_SSL_VISION_BRIDGE_MULTI_NODE_HPP_
+#endif  // KIKS_SSL_VISION_BRIDGE__MULTI_NODE_HPP_

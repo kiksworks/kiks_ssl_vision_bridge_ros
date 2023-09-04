@@ -5,7 +5,7 @@
   <version>0.0.0</version>
   <description>bridge of ssl_vision to ros2 topic</description>
   <maintainer email="kiks.nittc@gmail.com">kiks</maintainer>
-  <license>GNU GENERAL PUBLIC LICENSE Version 3</license>
+  <license>gplv3</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
