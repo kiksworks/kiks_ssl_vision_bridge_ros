@@ -18,16 +18,16 @@
 #include <cstdint>
 
 #include "QUdpSocket"
-#include "rclcpp/node.hpp"
 
 #include "nav_msgs/msg/occupancy_grid.hpp"
 
 #include "kiks_ssl_vision_bridge/msg/vision_detection.hpp"
+#include "kiks_ssl_vision_bridge/ros_node_base.hpp"
 
 namespace kiks::ssl_vision_bridge
 {
 
-class BaseNode
+class BaseNode : public RosNodeBase
 {
 public:
   BaseNode(const rclcpp::NodeOptions &options = rclcpp::NodeOptions());
@@ -43,10 +43,6 @@ public:
     
   BaseNode(rclcpp::Node::SharedPtr node);
 
-  operator rclcpp::Node::SharedPtr() {
-    return node_;
-  }
-
 private:
   using VisionDetectionMsg = kiks_ssl_vision_bridge::msg::VisionDetection;
   using PoseWithIdMsg = kiks_ssl_vision_bridge::msg::PoseWithId;
@@ -54,7 +50,6 @@ private:
   using MapMsg = nav_msgs::msg::OccupancyGrid;
   using MapDataItr = std::vector<std::int8_t>::iterator;
 
-  rclcpp::Node::SharedPtr node_;
   QUdpSocket udp_socket_;
   std::string map_frame_id_;
   rclcpp::Publisher<VisionDetectionMsg>::SharedPtr vision_detection_publisher_;
@@ -62,7 +57,7 @@ private:
   MapMsg map_msg_;
   double map_wall_width_;
   rclcpp::Publisher<MapMsg>::SharedPtr map_publisher_;
-  rclcpp::TimerBase::SharedPtr receiver_;
+  rclcpp::TimerBase::SharedPtr timer_of_recv_;
 
   template <typename... Args>
   static MapDataItr fill_map_lines(MapDataItr itr, int width, int height, Args... args);

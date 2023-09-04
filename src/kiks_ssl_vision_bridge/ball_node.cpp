@@ -53,34 +53,31 @@ BallNode::BallNode(
   BallNode(std::make_shared<rclcpp::Node>(node_name, node_namespace, options)) {}
   
 BallNode::BallNode(rclcpp::Node::SharedPtr node) :
-  node_(std::move(node))
+  RosNodeBase(std::move(node))
 {
-  const bool sub_namespace_is_empty = node_->get_sub_namespace().empty();
-  const auto tf_namespace = sub_namespace_is_empty ? "" : node_->get_sub_namespace() + "/";
   const auto topic_namespace = std::string(node_->get_namespace()) == "/" ? "/" : std::string(node_->get_namespace()) + "/";
+  this->add_parameter<bool>("tf.enable", false, [this, topic_namespace](const auto& param) {
+    if(param.as_bool()) {
+      tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*node_);
+      vision_detection_subscription_ = node_->create_subscription<VisionDetectionMsg>(
+        topic_namespace + "vision_detection",
+        rclcpp::QoS(4).best_effort(),
+        std::bind(&BallNode::extract_with_tf, this, std::placeholders::_1));
+    }
+    else {
+      tf_broadcaster_.reset();
+      vision_detection_subscription_ = node_->create_subscription<VisionDetectionMsg>(
+        topic_namespace + "vision_detection",
+        rclcpp::QoS(4).best_effort(),
+        std::bind(&BallNode::extract, this, std::placeholders::_1));
+    }
+  });
 
-  auto init = [this](const std::string& name, const auto& value) {
-    return declare_parameter_if_not_set(node_, name, value, node_->get_sub_namespace());
-  };
-  
-  auto tf_enable = init("tf.enable", false);
-  tf_msg_.child_frame_id = tf_namespace + init("frame_id", std::string("ball"));
+  const auto tf_namespace = node_->get_sub_namespace().empty() ? "" : node_->get_sub_namespace() + "/";
+  this->add_parameter<std::string>("frame_id", "ball", [this, tf_namespace](const auto& param){ tf_msg_.child_frame_id = tf_namespace + param.as_string(); });
 
-  ball_publisher_ = 
+  ball_publisher_ =
     node_->create_publisher<PointMsg>("ball", rclcpp::QoS(4).best_effort());
-  if(tf_enable) {
-    tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*node_);
-    vision_detection_subscription_ = node_->create_subscription<VisionDetectionMsg>(
-      topic_namespace + "vision_detection",
-      rclcpp::QoS(4).best_effort(),
-      std::bind(&BallNode::extract_with_tf, this, std::placeholders::_1));
-  }
-  else {
-    vision_detection_subscription_ = node_->create_subscription<VisionDetectionMsg>(
-      topic_namespace + "vision_detection",
-      rclcpp::QoS(4).best_effort(),
-      std::bind(&BallNode::extract, this, std::placeholders::_1));
-  }
 }
 
 void BallNode::extract(VisionDetectionMsg::ConstSharedPtr vision_detection_msg)

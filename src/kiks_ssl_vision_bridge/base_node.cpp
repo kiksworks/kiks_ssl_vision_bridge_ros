@@ -41,21 +41,25 @@ BaseNode::BaseNode(
   BaseNode(std::make_shared<rclcpp::Node>(node_name, node_namespace, options)) {}
   
 BaseNode::BaseNode(rclcpp::Node::SharedPtr node) :
-  node_(std::move(node)),
-  map_frame_id_(node_->declare_parameter<std::string>("map.frame_id", "map")),
-  vision_detection_publisher_(node_->create_publisher<VisionDetectionMsg>("vision_detection", rclcpp::QoS(4).best_effort())),
-  map_enable_(node_->declare_parameter<bool>("map.enable", true)),
-  receiver_(node_->create_wall_timer(10ms, std::bind(&BaseNode::receive, this)))
+  RosNodeBase(std::move(node))
 {
-  udp_socket_.bind(QHostAddress::AnyIPv4, 10006);
-  udp_socket_.joinMulticastGroup(QHostAddress("224.5.23.2"));
+  this->add_parameter<std::int64_t>("udp.port", 10006, [this](const auto& param){ udp_socket_.bind(QHostAddress::AnyIPv4, param.as_int()); });
+  this->add_parameter<std::string>("udp.address", "224.5.23.2", [this](const auto& param){ udp_socket_.joinMulticastGroup(QHostAddress(param.as_string().c_str())); });
+  this->add_parameter<bool>("map.enable", true, [this](const auto& param){ 
+    if(param.as_bool()){
+      map_publisher_ = node_->create_publisher<MapMsg>("map", rclcpp::QoS(4));
+    }
+    else {
+      map_publisher_.reset();
+    }
+  });
+  this->add_parameter<double>("map.resolution", 0.01, [this](const auto& param){ map_msg_.info.resolution = param.as_double(); });
+  this->add_parameter<double>("map.wall_width", 0.1, [this](const auto& param){ map_wall_width_ = param.as_double(); });
+  this->add_parameter<std::string>("map.frame_id", "map", [this](const auto& param){ map_frame_id_ = param.as_string(); });
 
-  map_msg_.info.resolution = node_->declare_parameter<double>("map.resolution", 0.01);
-  map_wall_width_ = node_->declare_parameter<double>("map.wall_width", 0.1);
+  vision_detection_publisher_ = node_->create_publisher<VisionDetectionMsg>("vision_detection", rclcpp::QoS(4).best_effort());
 
-  if(map_enable_) {
-    map_publisher_ = node_->create_publisher<MapMsg>("map", rclcpp::QoS(4));
-  }
+  timer_of_recv_ = node_->create_wall_timer(10ms, std::bind(&BaseNode::receive, this));
 }
 
 void BaseNode::receive()
@@ -67,7 +71,7 @@ void BaseNode::receive()
   bool timer_has_reseted = false;
   auto reset_timer_once = [&timer_has_reseted, this](){
     if(!timer_has_reseted) {
-      receiver_->reset();
+      timer_of_recv_->reset();
       timer_has_reseted = true;
     }
   };
@@ -173,7 +177,7 @@ void BaseNode::publish_vision_detection(const QByteArray& recv_byte_arr)
     vision_detection_publisher_->publish(vision_detection_msg);
   }
 
-  if(map_enable_ && packet.has_geometry()) {
+  if(map_publisher_ && packet.has_geometry()) {
     map_msg_.header.stamp = now;
     map_msg_.header.frame_id = map_frame_id_;
     const auto& field = packet.geometry().field();

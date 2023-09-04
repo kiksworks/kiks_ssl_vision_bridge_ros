@@ -21,11 +21,12 @@
 #include "tf2_ros/transform_broadcaster.h"
 
 #include "kiks_ssl_vision_bridge/msg/vision_detection.hpp"
+#include "kiks_ssl_vision_bridge/ros_node_base.hpp"
 
 namespace kiks::ssl_vision_bridge
 {
 
-class RobotNode
+class RobotNode : public RosNodeBase
 {
 public:
   static std::string default_name();
@@ -43,16 +44,11 @@ public:
     
   RobotNode(rclcpp::Node::SharedPtr node);
 
-  operator rclcpp::Node::SharedPtr() {
-    return node_;
-  }
-
 private:
   using VisionDetectionMsg = kiks_ssl_vision_bridge::msg::VisionDetection;
   using PoseMsg = geometry_msgs::msg::PoseStamped;
   using TfMsg = geometry_msgs::msg::TransformStamped;
 
-  rclcpp::Node::SharedPtr node_;
   bool team_is_yellow_;
   int robot_id_;
   bool tf_enable_;

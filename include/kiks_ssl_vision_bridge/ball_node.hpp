@@ -19,15 +19,15 @@
 
 #include "geometry_msgs/msg/point_stamped.hpp"
 #include "geometry_msgs/msg/transform_stamped.hpp"
-#include "rclcpp/node.hpp"
 #include "tf2_ros/transform_broadcaster.h"
 
 #include "kiks_ssl_vision_bridge/msg/vision_detection.hpp"
+#include "kiks_ssl_vision_bridge/ros_node_base.hpp"
 
 namespace kiks::ssl_vision_bridge
 {
 
-class BallNode
+class BallNode : public RosNodeBase
 {
 public:
   static std::string default_name();
@@ -45,10 +45,6 @@ public:
     
   BallNode(rclcpp::Node::SharedPtr node);
 
-  operator rclcpp::Node::SharedPtr() {
-    return node_;
-  }
-
 private:
   using VisionDetectionMsg = kiks_ssl_vision_bridge::msg::VisionDetection;
   using PointMsg = geometry_msgs::msg::PointStamped;
@@ -62,7 +58,6 @@ private:
 
   void broadcast_ball_tf(VisionDetectionMsg::ConstSharedPtr vision_detection_msg);
 
-  rclcpp::Node::SharedPtr node_;
   TfMsg tf_msg_;
   rclcpp::Publisher<PointMsg>::SharedPtr ball_publisher_;
   std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;

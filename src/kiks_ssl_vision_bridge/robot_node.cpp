@@ -50,24 +50,29 @@ RobotNode::RobotNode(
   RobotNode(std::make_shared<rclcpp::Node>(node_name, node_namespace, options)) {}
   
 RobotNode::RobotNode(rclcpp::Node::SharedPtr node) :
-  node_(std::move(node))
+  RosNodeBase(std::move(node))
 {
-  const bool sub_namespace_is_empty = node_->get_sub_namespace().empty();
-  const auto tf_namespace = sub_namespace_is_empty ? "" : node_->get_sub_namespace() + "/";
-  const auto topic_namespace = std::string(node_->get_namespace()) == "/" ? "/" : std::string(node_->get_namespace()) + "/";
+  this->add_parameter<std::string>("team_color", "yellow", [this](const auto& param){
+    team_is_yellow_ = param.as_string() == "yellow";
+  });
+  this->add_parameter<std::int64_t>("robot_id", 0, [this](const auto& param){ robot_id_ = param.as_int(); });
+  this->add_parameter<bool>("tf.enable", false, [this](const auto& param){
+    tf_enable_ = param.as_bool();
+    if(tf_enable_) {
+      tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*node_);
+    }
+    else {
+      tf_broadcaster_.reset();
+    }
+  });
 
-  auto init = [this](const std::string& name, const auto& value) {
-    return declare_parameter_if_not_set(node_, name, value, node_->get_sub_namespace());
-  };
-  
-  team_is_yellow_ = init("team_color", std::string("yellow")) == "yellow";
-  robot_id_ = init("robot_id", 0);
-  tf_enable_ = init("tf.enable", false);
-  tf_msg_.child_frame_id = tf_namespace + init("frame_id", std::string("vision_footprint"));
+  const auto tf_namespace = node_->get_sub_namespace().empty() ? "" : node_->get_sub_namespace() + "/";
+  this->add_parameter<std::string>("frame_id", std::string("vision_footprint"), [this, tf_namespace](const auto& param){ tf_msg_.child_frame_id = tf_namespace + param.as_string(); });
 
-  robot_publisher_ = 
+  robot_publisher_ =
     node_->create_publisher<PoseMsg>("vision_footprint", rclcpp::QoS(4).best_effort());
-  tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*node_);
+
+  const auto topic_namespace = std::string(node_->get_namespace()) == "/" ? "/" : std::string(node_->get_namespace()) + "/";
   vision_detection_subscription_ = node_->create_subscription<VisionDetectionMsg>(
     topic_namespace + "vision_detection", 
     rclcpp::QoS(4).best_effort(), 

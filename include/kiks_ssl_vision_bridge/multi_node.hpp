@@ -17,13 +17,13 @@
 
 #include <list>
 
-#include "rclcpp/node.hpp"
+#include "kiks_ssl_vision_bridge/ros_node_base.hpp"
 
 namespace kiks::ssl_vision_bridge
 {
 
 template <class BaseNode>
-class MultiNode
+class MultiNode : public RosNodeBase
 {
 public:
   MultiNode(const rclcpp::NodeOptions &options = rclcpp::NodeOptions()) :
@@ -41,21 +41,16 @@ public:
     MultiNode(std::make_shared<rclcpp::Node>(node_name, options)) {}
     
   MultiNode(rclcpp::Node::SharedPtr node) :
-    node_(std::move(node))
+    RosNodeBase(std::move(node))
   {
-    auto sub_namespaces = node_->declare_parameter<std::vector<std::string>>("namespaces", std::vector<std::string>());
-    for(const auto& sub_namespace : sub_namespaces) {
-      base_node_list_.emplace_back(node_->create_sub_node(sub_namespace));
-    }
-  }
-
-  operator rclcpp::Node::SharedPtr() {
-    return node_;
+    this->add_parameter<std::vector<std::string>>("namespaces", std::vector<std::string>(), [this](const auto& param){
+      for(const auto& sub_namespace : param.as_string_array()) {
+        base_node_list_.emplace_back(node_->create_sub_node(sub_namespace));
+      }
+    });
   }
 
 private:
-  rclcpp::Node::SharedPtr node_;
-
   std::list<BaseNode> base_node_list_;
 };
 
