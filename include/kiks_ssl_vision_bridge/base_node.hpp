@@ -15,8 +15,12 @@
 #ifndef KIKS_SSL_VISION_BRIDGE_BASE_NODE_HPP_
 #define KIKS_SSL_VISION_BRIDGE_BASE_NODE_HPP_
 
+#include <cstdint>
+
 #include "QUdpSocket"
 #include "rclcpp/node.hpp"
+
+#include "nav_msgs/msg/occupancy_grid.hpp"
 
 #include "kiks_ssl_vision_bridge/msg/vision_detection.hpp"
 
@@ -47,12 +51,35 @@ private:
   using VisionDetectionMsg = kiks_ssl_vision_bridge::msg::VisionDetection;
   using PoseWithIdMsg = kiks_ssl_vision_bridge::msg::PoseWithId;
   using PointMsg = geometry_msgs::msg::Point;
+  using MapMsg = nav_msgs::msg::OccupancyGrid;
+  using MapDataItr = std::vector<std::int8_t>::iterator;
 
   rclcpp::Node::SharedPtr node_;
   QUdpSocket udp_socket_;
   std::string map_frame_id_;
   rclcpp::Publisher<VisionDetectionMsg>::SharedPtr vision_detection_publisher_;
+  bool map_enable_;
+  MapMsg map_msg_;
+  double map_wall_width_;
+  rclcpp::Publisher<MapMsg>::SharedPtr map_publisher_;
   rclcpp::TimerBase::SharedPtr receiver_;
+
+  template <typename... Args>
+  static MapDataItr fill_map_lines(MapDataItr itr, int width, int height, Args... args);
+
+  template <typename... Args>
+  static MapDataItr fill_map_lines_millor(MapDataItr itr, int width, int height, Args... args);
+
+  template <typename... Args>
+  static MapDataItr fill_map_line(MapDataItr itr, int width, int begin, int end, Args... args);
+
+  static MapDataItr fill_map_line(MapDataItr itr, int width);
+
+  template <typename... Args>
+  static MapDataItr fill_map_line_millor(MapDataItr itr, int width, int begin, int end, Args... args);
+
+  static MapDataItr fill_map_line_millor(MapDataItr itr, int width);
+
 
   void receive();
 

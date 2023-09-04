@@ -15,6 +15,7 @@
 #include "kiks_ssl_vision_bridge/base_node.hpp"
 
 #include <cmath>
+#include <cstddef>
 
 #include "QNetworkDatagram"
 
@@ -43,6 +44,7 @@ BaseNode::BaseNode(rclcpp::Node::SharedPtr node) :
   node_(std::move(node)),
   map_frame_id_(node_->declare_parameter<std::string>("map.frame_id", "map")),
   vision_detection_publisher_(node_->create_publisher<VisionDetectionMsg>("vision_detection", rclcpp::QoS(4).best_effort())),
+  map_enable_(node_->declare_parameter<bool>("map.enable", true)),
   receiver_(node_->create_wall_timer(10ms, std::bind(&BaseNode::receive, this)))
   {
     udp_socket_.bind(QHostAddress::AnyIPv4, 10009);
@@ -50,6 +52,13 @@ BaseNode::BaseNode(rclcpp::Node::SharedPtr node) :
     udp_socket_.abort();
     udp_socket_.bind(QHostAddress::AnyIPv4, 10006);
     udp_socket_.joinMulticastGroup(QHostAddress("224.5.23.2"));
+
+    map_msg_.info.resolution = node_->declare_parameter<double>("map.resolution", 0.01);
+    map_wall_width_ = node_->declare_parameter<double>("map.wall_width", 0.1);
+
+    if(map_enable_) {
+      map_publisher_ = node_->create_publisher<MapMsg>("map", rclcpp::QoS(4));
+    }
   }
 
 void BaseNode::receive()
@@ -78,6 +87,51 @@ void BaseNode::receive()
   reset_timer_once();
 }
 
+template <typename... Args>
+BaseNode::MapDataItr BaseNode::fill_map_lines(MapDataItr itr, int width, int height, Args... args) {
+  auto itr_end = itr + height * width;
+  while(itr < itr_end) {
+    itr = fill_map_line(itr, width, args...);
+  }
+  return itr_end;
+}
+
+template <typename... Args>
+BaseNode::MapDataItr BaseNode::fill_map_lines_millor(MapDataItr itr, int width, int height, Args... args) {
+  auto itr_end = itr + height * width;
+  while(itr < itr_end) {
+    itr = fill_map_line_millor(itr, width, args...);
+  }
+  return itr_end;
+}
+
+template <typename... Args>
+BaseNode::MapDataItr BaseNode::fill_map_line(MapDataItr itr, int width, int begin, int end, Args... args) {
+  std::for_each(itr + begin, itr + end, [](auto& val){
+    val = 100;
+  });
+  return fill_map_line(itr, width, args...);
+}
+
+BaseNode::MapDataItr BaseNode::fill_map_line(MapDataItr itr, int width) {
+  return itr + width;
+}
+
+template <typename... Args>
+BaseNode::MapDataItr BaseNode::fill_map_line_millor(MapDataItr itr, int width, int begin, int end, Args... args) {
+  std::for_each(itr + begin, itr + end, [](auto& val){
+    val = 100;
+  });
+  std::for_each(itr + width - end, itr + width - begin, [](auto& val){
+    val = 100;
+  });
+  return fill_map_line_millor(itr, width, args...);
+}
+
+BaseNode::MapDataItr BaseNode::fill_map_line_millor(MapDataItr itr, int width) {
+  return itr + width;
+}
+
 void BaseNode::publish_vision_detection(const QByteArray& recv_byte_arr)
 {
   thread_local SSL_WrapperPacket packet;
@@ -86,11 +140,13 @@ void BaseNode::publish_vision_detection(const QByteArray& recv_byte_arr)
     return;
   }
 
+  auto now = node_->now();
+
   if(packet.has_detection()) {
     const auto & detection = packet.detection();
 
     VisionDetectionMsg vision_detection_msg;
-    vision_detection_msg.header.stamp = node_->now();
+    vision_detection_msg.header.stamp = now;
     vision_detection_msg.header.frame_id = map_frame_id_;
 
     for (const auto & ball : detection.balls()) {
@@ -120,8 +176,33 @@ void BaseNode::publish_vision_detection(const QByteArray& recv_byte_arr)
     vision_detection_publisher_->publish(vision_detection_msg);
   }
 
-  if(packet.has_geometry()) {
-    
+  if(map_enable_ && packet.has_geometry()) {
+    map_msg_.header.stamp = now;
+    map_msg_.header.frame_id = map_frame_id_;
+    const auto& field = packet.geometry().field();
+    map_msg_.info.map_load_time = now;
+    auto width = field.field_length() * 0.001 + (field.boundary_width() * 0.001 + map_wall_width_) * 2;
+    auto height = field.field_width() * 0.001 + (field.boundary_width() * 0.001 + map_wall_width_) * 2;
+    map_msg_.info.width = width / map_msg_.info.resolution;
+    map_msg_.info.height = height / map_msg_.info.resolution;
+    int wall_count = map_wall_width_ / map_msg_.info.resolution;
+    int boundary_width = field.boundary_width() * 0.001 / map_msg_.info.resolution;
+    int goal_width = field.goal_depth() * 0.001 / map_msg_.info.resolution;
+    int goal_height = field.goal_width() * 0.001 / map_msg_.info.resolution;
+    int wall_to_goal_height = (map_msg_.info.height - goal_height) * 0.5 - wall_count * 2;
+    map_msg_.info.origin.position.x = width * -0.5;
+    map_msg_.info.origin.position.y = height * -0.5;
+    map_msg_.info.origin.orientation.w = 1;
+    map_msg_.data.resize(map_msg_.info.width * map_msg_.info.height);
+    auto itr = map_msg_.data.begin();
+    itr = fill_map_lines(itr, map_msg_.info.width, wall_count, 0, map_msg_.info.width);
+    itr = fill_map_lines_millor(itr, map_msg_.info.width, wall_to_goal_height, 0, wall_count);
+    itr = fill_map_lines_millor(itr, map_msg_.info.width, wall_count, 0, wall_count + boundary_width);
+    itr = fill_map_lines_millor(itr, map_msg_.info.width, goal_height, 0, wall_count + boundary_width - goal_width);
+    itr = fill_map_lines_millor(itr, map_msg_.info.width, wall_count, 0, wall_count + boundary_width);
+    itr = fill_map_lines_millor(itr, map_msg_.info.width, wall_to_goal_height, 0, wall_count);
+    itr = fill_map_lines(itr, map_msg_.info.width, wall_count, 0, map_msg_.info.width);
+    map_publisher_->publish(map_msg_);
   }
 }
 

@@ -5,6 +5,7 @@ project(kiks_ssl_vision_bridge)
 set(ros2_required_packages
   rclcpp
   geometry_msgs
+  nav_msgs
   std_msgs
   tf2_ros)
 
