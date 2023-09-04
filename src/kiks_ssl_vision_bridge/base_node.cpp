@@ -26,38 +26,53 @@ namespace kiks::ssl_vision_bridge
 
 using namespace std::chrono_literals;
 
-BaseNode::BaseNode(const rclcpp::NodeOptions &options) :
-  BaseNode(std::make_shared<rclcpp::Node>("ssl_vision_bridge_base", options)) {}
-
-BaseNode::BaseNode(
-  const std::string &node_name,
-  const rclcpp::NodeOptions &options) :
-  BaseNode(std::make_shared<rclcpp::Node>(node_name, options)) {}
-
-BaseNode::BaseNode(
-  const std::string &node_name,
-  const std::string &node_namespace, 
-  const rclcpp::NodeOptions &options) :
-  BaseNode(std::make_shared<rclcpp::Node>(node_name, node_namespace, options)) {}
-  
-BaseNode::BaseNode(rclcpp::Node::SharedPtr node) :
-  RosNodeBase(std::move(node))
+BaseNode::BaseNode(const rclcpp::NodeOptions & options)
+: BaseNode(std::make_shared<rclcpp::Node>("ssl_vision_bridge_base", options))
 {
-  this->add_parameter<std::int64_t>("udp.port", 10006, [this](const auto& param){ udp_socket_.bind(QHostAddress::AnyIPv4, param.as_int()); });
-  this->add_parameter<std::string>("udp.address", "224.5.23.2", [this](const auto& param){ udp_socket_.joinMulticastGroup(QHostAddress(param.as_string().c_str())); });
-  this->add_parameter<bool>("map.enable", true, [this](const auto& param){ 
-    if(param.as_bool()){
-      map_publisher_ = node_->create_publisher<MapMsg>("map", rclcpp::QoS(4));
-    }
-    else {
-      map_publisher_.reset();
-    }
-  });
-  this->add_parameter<double>("map.resolution", 0.01, [this](const auto& param){ map_msg_.info.resolution = param.as_double(); });
-  this->add_parameter<double>("map.wall_width", 0.1, [this](const auto& param){ map_wall_width_ = param.as_double(); });
-  this->add_parameter<std::string>("map.frame_id", "map", [this](const auto& param){ map_frame_id_ = param.as_string(); });
+}
 
-  vision_detection_publisher_ = node_->create_publisher<VisionDetectionMsg>("vision_detection", rclcpp::QoS(4).best_effort());
+BaseNode::BaseNode(const std::string & node_name, const rclcpp::NodeOptions & options)
+: BaseNode(std::make_shared<rclcpp::Node>(node_name, options))
+{
+}
+
+BaseNode::BaseNode(
+  const std::string & node_name, const std::string & node_namespace,
+  const rclcpp::NodeOptions & options)
+: BaseNode(std::make_shared<rclcpp::Node>(node_name, node_namespace, options))
+{
+}
+
+BaseNode::BaseNode(rclcpp::Node::SharedPtr node)
+: RosNodeBase(std::move(node))
+{
+  this->add_parameter<std::int64_t>(
+    "udp.port", 10006, [this](const auto & param) {
+      udp_socket_.bind(QHostAddress::AnyIPv4, param.as_int());
+    });
+  this->add_parameter<std::string>(
+    "udp.address", "224.5.23.2", [this](const auto & param) {
+      udp_socket_.joinMulticastGroup(QHostAddress(param.as_string().c_str()));
+    });
+  this->add_parameter<bool>(
+    "map.enable", true, [this](const auto & param) {
+      if (param.as_bool()) {
+        map_publisher_ = node_->create_publisher<MapMsg>("map", rclcpp::QoS(4));
+      } else {
+        map_publisher_.reset();
+      }
+    });
+  this->add_parameter<double>(
+    "map.resolution", 0.01, [this](const auto & param) {
+      map_msg_.info.resolution = param.as_double();
+    });
+  this->add_parameter<double>(
+    "map.wall_width", 0.1, [this](const auto & param) {map_wall_width_ = param.as_double();});
+  this->add_parameter<std::string>(
+    "map.frame_id", "map", [this](const auto & param) {map_frame_id_ = param.as_string();});
+
+  vision_detection_publisher_ =
+    node_->create_publisher<VisionDetectionMsg>("vision_detection", rclcpp::QoS(4).best_effort());
 
   timer_of_recv_ = node_->create_wall_timer(10ms, std::bind(&BaseNode::receive, this));
 }
@@ -69,71 +84,71 @@ void BaseNode::receive()
   auto end_time = timeout_time;
 
   bool timer_has_reseted = false;
-  auto reset_timer_once = [&timer_has_reseted, this](){
-    if(!timer_has_reseted) {
-      timer_of_recv_->reset();
-      timer_has_reseted = true;
-    }
-  };
+  auto reset_timer_once = [&timer_has_reseted, this]() {
+      if (!timer_has_reseted) {
+        timer_of_recv_->reset();
+        timer_has_reseted = true;
+      }
+    };
 
   do {
-    if(udp_socket_.hasPendingDatagrams()) {
+    if (udp_socket_.hasPendingDatagrams()) {
       this->publish_vision_detection(udp_socket_.receiveDatagram().data());
       reset_timer_once();
       end_time = std::min(now + 1ms, timeout_time);
     }
     now = node_->now();
-  } while(now < end_time);
+  } while (now < end_time);
 
   reset_timer_once();
 }
 
-template <typename... Args>
-BaseNode::MapDataItr BaseNode::fill_map_lines(MapDataItr itr, int width, int height, Args... args) {
+template<typename ... Args>
+BaseNode::MapDataItr BaseNode::fill_map_lines(MapDataItr itr, int width, int height, Args... args)
+{
   auto itr_end = itr + height * width;
-  while(itr < itr_end) {
-    itr = fill_map_line(itr, width, args...);
+  while (itr < itr_end) {
+    itr = fill_map_line(itr, width, args ...);
   }
   return itr_end;
 }
 
-template <typename... Args>
-BaseNode::MapDataItr BaseNode::fill_map_lines_millor(MapDataItr itr, int width, int height, Args... args) {
+template<typename ... Args>
+BaseNode::MapDataItr BaseNode::fill_map_lines_millor(
+  MapDataItr itr, int width, int height, Args... args)
+{
   auto itr_end = itr + height * width;
-  while(itr < itr_end) {
-    itr = fill_map_line_millor(itr, width, args...);
+  while (itr < itr_end) {
+    itr = fill_map_line_millor(itr, width, args ...);
   }
   return itr_end;
 }
 
-template <typename... Args>
-BaseNode::MapDataItr BaseNode::fill_map_line(MapDataItr itr, int width, int begin, int end, Args... args) {
-  std::for_each(itr + begin, itr + end, [](auto& val){
-    val = 100;
-  });
-  return fill_map_line(itr, width, args...);
+template<typename ... Args>
+BaseNode::MapDataItr BaseNode::fill_map_line(
+  MapDataItr itr, int width, int begin, int end, Args... args)
+{
+  std::for_each(itr + begin, itr + end, [](auto & val) {val = 100;});
+  return fill_map_line(itr, width, args ...);
 }
 
-BaseNode::MapDataItr BaseNode::fill_map_line(MapDataItr itr, int width) {
+BaseNode::MapDataItr BaseNode::fill_map_line(MapDataItr itr, int width) {return itr + width;}
+
+template<typename ... Args>
+BaseNode::MapDataItr BaseNode::fill_map_line_millor(
+  MapDataItr itr, int width, int begin, int end, Args... args)
+{
+  std::for_each(itr + begin, itr + end, [](auto & val) {val = 100;});
+  std::for_each(itr + width - end, itr + width - begin, [](auto & val) {val = 100;});
+  return fill_map_line_millor(itr, width, args ...);
+}
+
+BaseNode::MapDataItr BaseNode::fill_map_line_millor(MapDataItr itr, int width)
+{
   return itr + width;
 }
 
-template <typename... Args>
-BaseNode::MapDataItr BaseNode::fill_map_line_millor(MapDataItr itr, int width, int begin, int end, Args... args) {
-  std::for_each(itr + begin, itr + end, [](auto& val){
-    val = 100;
-  });
-  std::for_each(itr + width - end, itr + width - begin, [](auto& val){
-    val = 100;
-  });
-  return fill_map_line_millor(itr, width, args...);
-}
-
-BaseNode::MapDataItr BaseNode::fill_map_line_millor(MapDataItr itr, int width) {
-  return itr + width;
-}
-
-void BaseNode::publish_vision_detection(const QByteArray& recv_byte_arr)
+void BaseNode::publish_vision_detection(const QByteArray & recv_byte_arr)
 {
   thread_local SSL_WrapperPacket packet;
   if (!packet.ParseFromArray(recv_byte_arr.data(), recv_byte_arr.size())) {
@@ -143,7 +158,7 @@ void BaseNode::publish_vision_detection(const QByteArray& recv_byte_arr)
 
   auto now = node_->now();
 
-  if(packet.has_detection()) {
+  if (packet.has_detection()) {
     const auto & detection = packet.detection();
 
     VisionDetectionMsg vision_detection_msg;
@@ -157,19 +172,19 @@ void BaseNode::publish_vision_detection(const QByteArray& recv_byte_arr)
       ball_msg.z = ball.z() * 0.001;
       vision_detection_msg.balls.push_back(ball_msg);
     }
-    
-    auto convert_robots = [](const auto& robots, auto& robots_msg) {
-      for(const auto& robot : robots) {
-        PoseWithIdMsg robot_msg;
-        robot_msg.id = robot.robot_id();
-        robot_msg.pose.position.x = robot.x() * 0.001;
-        robot_msg.pose.position.y = robot.y() * 0.001;
-        auto theta = robot.orientation() * 0.5;
-        robot_msg.pose.orientation.z = std::sin(theta);
-        robot_msg.pose.orientation.w = std::cos(theta);
-        robots_msg.push_back(robot_msg);
-      }
-    };
+
+    auto convert_robots = [](const auto & robots, auto & robots_msg) {
+        for (const auto & robot : robots) {
+          PoseWithIdMsg robot_msg;
+          robot_msg.id = robot.robot_id();
+          robot_msg.pose.position.x = robot.x() * 0.001;
+          robot_msg.pose.position.y = robot.y() * 0.001;
+          auto theta = robot.orientation() * 0.5;
+          robot_msg.pose.orientation.z = std::sin(theta);
+          robot_msg.pose.orientation.w = std::cos(theta);
+          robots_msg.push_back(robot_msg);
+        }
+      };
 
     convert_robots(detection.robots_yellow(), vision_detection_msg.yellow_robots);
     convert_robots(detection.robots_blue(), vision_detection_msg.blue_robots);
@@ -177,13 +192,15 @@ void BaseNode::publish_vision_detection(const QByteArray& recv_byte_arr)
     vision_detection_publisher_->publish(vision_detection_msg);
   }
 
-  if(map_publisher_ && packet.has_geometry()) {
+  if (map_publisher_ && packet.has_geometry()) {
     map_msg_.header.stamp = now;
     map_msg_.header.frame_id = map_frame_id_;
-    const auto& field = packet.geometry().field();
+    const auto & field = packet.geometry().field();
     map_msg_.info.map_load_time = now;
-    auto width = field.field_length() * 0.001 + (field.boundary_width() * 0.001 + map_wall_width_) * 2;
-    auto height = field.field_width() * 0.001 + (field.boundary_width() * 0.001 + map_wall_width_) * 2;
+    auto width =
+      field.field_length() * 0.001 + (field.boundary_width() * 0.001 + map_wall_width_) * 2;
+    auto height =
+      field.field_width() * 0.001 + (field.boundary_width() * 0.001 + map_wall_width_) * 2;
     map_msg_.info.width = width / map_msg_.info.resolution;
     map_msg_.info.height = height / map_msg_.info.resolution;
     int wall_count = map_wall_width_ / map_msg_.info.resolution;
@@ -198,13 +215,16 @@ void BaseNode::publish_vision_detection(const QByteArray& recv_byte_arr)
     auto itr = map_msg_.data.begin();
     itr = fill_map_lines(itr, map_msg_.info.width, wall_count, 0, map_msg_.info.width);
     itr = fill_map_lines_millor(itr, map_msg_.info.width, wall_to_goal_height, 0, wall_count);
-    itr = fill_map_lines_millor(itr, map_msg_.info.width, wall_count, 0, wall_count + boundary_width);
-    itr = fill_map_lines_millor(itr, map_msg_.info.width, goal_height, 0, wall_count + boundary_width - goal_width);
-    itr = fill_map_lines_millor(itr, map_msg_.info.width, wall_count, 0, wall_count + boundary_width);
+    itr =
+      fill_map_lines_millor(itr, map_msg_.info.width, wall_count, 0, wall_count + boundary_width);
+    itr = fill_map_lines_millor(
+      itr, map_msg_.info.width, goal_height, 0, wall_count + boundary_width - goal_width);
+    itr =
+      fill_map_lines_millor(itr, map_msg_.info.width, wall_count, 0, wall_count + boundary_width);
     itr = fill_map_lines_millor(itr, map_msg_.info.width, wall_to_goal_height, 0, wall_count);
     itr = fill_map_lines(itr, map_msg_.info.width, wall_count, 0, map_msg_.info.width);
     map_publisher_->publish(map_msg_);
   }
 }
 
-} // namespace kiks::ssl_vision_bridge
+}  // namespace kiks::ssl_vision_bridge

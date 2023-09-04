@@ -29,19 +29,19 @@ class RosNodeBase
 public:
   RosNodeBase(rclcpp::Node::SharedPtr node);
 
-  operator rclcpp::Node::SharedPtr() {
-    return node_;
-  }
+  operator rclcpp::Node::SharedPtr() {return node_;}
 
 protected:
-  using SetParamFunc = std::function<void(const rclcpp::Parameter &)>;
+  using SetParamFunc = std::function<void (const rclcpp::Parameter &)>;
 
-  template <typename T>
+  template<typename T>
   void add_parameter(std::string name, T default_value, SetParamFunc set_param_func);
 
-  template <typename T, typename MemberFunc, typename ClassPtr>
-  void add_parameter(std::string name, T default_value, MemberFunc member_func, ClassPtr class_ptr) {
-    create_parameter(std::move(name), default_value, std::bind(member_func, class_ptr, std::placeholders::_1));
+  template<typename T, typename MemberFunc, typename ClassPtr>
+  void add_parameter(std::string name, T default_value, MemberFunc member_func, ClassPtr class_ptr)
+  {
+    create_parameter(
+      std::move(name), default_value, std::bind(member_func, class_ptr, std::placeholders::_1));
   }
 
   rclcpp::Node::SharedPtr node_;
@@ -49,15 +49,17 @@ protected:
   std::unordered_map<std::string, SetParamFunc> set_param_func_map_;
 
 private:
-  rcl_interfaces::msg::SetParametersResult set_parameters(std::vector<rclcpp::Parameter> parameters);
+  rcl_interfaces::msg::SetParametersResult set_parameters(
+    std::vector<rclcpp::Parameter> parameters);
 
 #ifdef KIKS_ROS_DISTRO_DASHING
   OnParametersSetCallbackType on_set_parameters_callback_handle_;
 #else
-  rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr on_set_parameters_callback_handle_;
+  rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr
+    on_set_parameters_callback_handle_;
 #endif
 };
 
-} // namespace kiks::ssl_vision_bridge
+}  // namespace kiks::ssl_vision_bridge
 
-#endif // #ifndef KIKS_SSL_VISION_BRIDGE_ROS_NODE_BASE_HPP_
+#endif  // #ifndef KIKS_SSL_VISION_BRIDGE_ROS_NODE_BASE_HPP_

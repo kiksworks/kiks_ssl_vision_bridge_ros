@@ -20,69 +20,73 @@
 namespace kiks::ssl_vision_bridge
 {
 
-template <class T>
-T declare_parameter_if_not_set(rclcpp::Node::SharedPtr node, const std::string& name, const T& default_value, const std::string& parameter_namespace = ""){
-  auto value = node->has_parameter(name) ?
-    node->get_parameter(name).get_value<T>() :
+template<class T>
+T declare_parameter_if_not_set(
+  rclcpp::Node::SharedPtr node, const std::string & name, const T & default_value,
+  const std::string & parameter_namespace = "")
+{
+  auto value = node->has_parameter(name) ? node->get_parameter(name).get_value<T>() :
     node->declare_parameter<T>(name, default_value);
-  if(!parameter_namespace.empty()) {
+  if (!parameter_namespace.empty()) {
     value = declare_parameter_if_not_set(node, parameter_namespace + "." + name, value);
   }
   return value;
-};
+}
 
 using namespace std::chrono_literals;
 
-std::string BallNode::default_name()
+std::string BallNode::default_name() {return "ssl_bridge_vision_ball";}
+
+BallNode::BallNode(const rclcpp::NodeOptions & options)
+: BallNode(std::make_shared<rclcpp::Node>(default_name(), options))
 {
-  return "ssl_bridge_vision_ball";
 }
 
-BallNode::BallNode(const rclcpp::NodeOptions &options) :
-  BallNode(std::make_shared<rclcpp::Node>(default_name(), options)) {}
-
-BallNode::BallNode(
-  const std::string &node_name,
-  const rclcpp::NodeOptions &options) :
-  BallNode(std::make_shared<rclcpp::Node>(node_name, options)) {}
-
-BallNode::BallNode(
-  const std::string &node_name,
-  const std::string &node_namespace, 
-  const rclcpp::NodeOptions &options) :
-  BallNode(std::make_shared<rclcpp::Node>(node_name, node_namespace, options)) {}
-  
-BallNode::BallNode(rclcpp::Node::SharedPtr node) :
-  RosNodeBase(std::move(node))
+BallNode::BallNode(const std::string & node_name, const rclcpp::NodeOptions & options)
+: BallNode(std::make_shared<rclcpp::Node>(node_name, options))
 {
-  const auto topic_namespace = std::string(node_->get_namespace()) == "/" ? "/" : std::string(node_->get_namespace()) + "/";
-  this->add_parameter<bool>("tf.enable", false, [this, topic_namespace](const auto& param) {
-    if(param.as_bool()) {
-      tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*node_);
-      vision_detection_subscription_ = node_->create_subscription<VisionDetectionMsg>(
-        topic_namespace + "vision_detection",
-        rclcpp::QoS(4).best_effort(),
-        std::bind(&BallNode::extract_with_tf, this, std::placeholders::_1));
-    }
-    else {
-      tf_broadcaster_.reset();
-      vision_detection_subscription_ = node_->create_subscription<VisionDetectionMsg>(
-        topic_namespace + "vision_detection",
-        rclcpp::QoS(4).best_effort(),
-        std::bind(&BallNode::extract, this, std::placeholders::_1));
-    }
-  });
+}
 
-  const auto tf_namespace = node_->get_sub_namespace().empty() ? "" : node_->get_sub_namespace() + "/";
-  this->add_parameter<std::string>("frame_id", "ball", [this, tf_namespace](const auto& param){ tf_msg_.child_frame_id = tf_namespace + param.as_string(); });
+BallNode::BallNode(
+  const std::string & node_name, const std::string & node_namespace,
+  const rclcpp::NodeOptions & options)
+: BallNode(std::make_shared<rclcpp::Node>(node_name, node_namespace, options))
+{
+}
 
-  ball_publisher_ =
-    node_->create_publisher<PointMsg>("ball", rclcpp::QoS(4).best_effort());
+BallNode::BallNode(rclcpp::Node::SharedPtr node)
+: RosNodeBase(std::move(node))
+{
+  const auto topic_namespace =
+    std::string(node_->get_namespace()) == "/" ? "/" : std::string(node_->get_namespace()) + "/";
+  this->add_parameter<bool>(
+    "tf.enable", false, [this, topic_namespace](const auto & param) {
+      if (param.as_bool()) {
+        tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*node_);
+        vision_detection_subscription_ = node_->create_subscription<VisionDetectionMsg>(
+          topic_namespace + "vision_detection", rclcpp::QoS(4).best_effort(),
+          std::bind(&BallNode::extract_with_tf, this, std::placeholders::_1));
+      } else {
+        tf_broadcaster_.reset();
+        vision_detection_subscription_ = node_->create_subscription<VisionDetectionMsg>(
+          topic_namespace + "vision_detection", rclcpp::QoS(4).best_effort(),
+          std::bind(&BallNode::extract, this, std::placeholders::_1));
+      }
+    });
+
+  const auto tf_namespace =
+    node_->get_sub_namespace().empty() ? "" : node_->get_sub_namespace() + "/";
+  this->add_parameter<std::string>(
+    "frame_id", "ball", [this, tf_namespace](const auto & param) {
+      tf_msg_.child_frame_id = tf_namespace + param.as_string();
+    });
+
+  ball_publisher_ = node_->create_publisher<PointMsg>("ball", rclcpp::QoS(4).best_effort());
 }
 
 void BallNode::extract(VisionDetectionMsg::ConstSharedPtr vision_detection_msg)
 {
-  if(!vision_detection_msg->balls.size()) {
+  if (!vision_detection_msg->balls.size()) {
     return;
   }
   publish_ball(vision_detection_msg);
@@ -90,7 +94,7 @@ void BallNode::extract(VisionDetectionMsg::ConstSharedPtr vision_detection_msg)
 
 void BallNode::extract_with_tf(VisionDetectionMsg::ConstSharedPtr vision_detection_msg)
 {
-  if(!vision_detection_msg->balls.size()) {
+  if (!vision_detection_msg->balls.size()) {
     return;
   }
   publish_ball(vision_detection_msg);
@@ -115,4 +119,4 @@ void BallNode::broadcast_ball_tf(VisionDetectionMsg::ConstSharedPtr vision_detec
   tf_broadcaster_->sendTransform(tf_msg_);
 }
 
-} // namespace kiks::ssl_vision_bridge
+}  // namespace kiks::ssl_vision_bridge

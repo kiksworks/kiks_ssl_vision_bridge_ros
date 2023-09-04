@@ -30,18 +30,16 @@ class RobotNode : public RosNodeBase
 {
 public:
   static std::string default_name();
-  
-  RobotNode(const rclcpp::NodeOptions &options = rclcpp::NodeOptions());
+
+  RobotNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
 
   RobotNode(
-    const std::string &node_name,
-    const rclcpp::NodeOptions &options = rclcpp::NodeOptions());
+    const std::string & node_name, const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
 
   RobotNode(
-    const std::string &node_name,
-    const std::string &node_namespace,
-    const rclcpp::NodeOptions &options = rclcpp::NodeOptions());
-    
+    const std::string & node_name, const std::string & node_namespace,
+    const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
+
   RobotNode(rclcpp::Node::SharedPtr node);
 
 private:
@@ -60,6 +58,6 @@ private:
   void convert(VisionDetectionMsg::ConstSharedPtr vision_detection_msg);
 };
 
-} // namespace kiks::ssl_vision_bridge
+}  // namespace kiks::ssl_vision_bridge
 
-#endif // #ifndef KIKS_SSL_VISION_BRIDGE_ROBOT_NODE_HPP_
+#endif  // #ifndef KIKS_SSL_VISION_BRIDGE_ROBOT_NODE_HPP_

@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "rclcpp/context.hpp"
-#include "rclcpp/executors/single_threaded_executor.hpp"
-
 #include "kiks_ssl_vision_bridge/ball_node.hpp"
 #include "kiks_ssl_vision_bridge/base_node.hpp"
+#include "rclcpp/context.hpp"
+#include "rclcpp/executors/single_threaded_executor.hpp"
 
 int main(int argc, char * argv[])
 {

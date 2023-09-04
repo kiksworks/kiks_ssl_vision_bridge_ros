@@ -17,9 +17,8 @@
 
 #include <cstdint>
 
-#include "QUdpSocket"
-
 #include "nav_msgs/msg/occupancy_grid.hpp"
+#include "QUdpSocket"
 
 #include "kiks_ssl_vision_bridge/msg/vision_detection.hpp"
 #include "kiks_ssl_vision_bridge/ros_node_base.hpp"
@@ -30,17 +29,15 @@ namespace kiks::ssl_vision_bridge
 class BaseNode : public RosNodeBase
 {
 public:
-  BaseNode(const rclcpp::NodeOptions &options = rclcpp::NodeOptions());
+  BaseNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
 
   BaseNode(
-    const std::string &node_name,
-    const rclcpp::NodeOptions &options = rclcpp::NodeOptions());
+    const std::string & node_name, const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
 
   BaseNode(
-    const std::string &node_name,
-    const std::string &node_namespace,
-    const rclcpp::NodeOptions &options = rclcpp::NodeOptions());
-    
+    const std::string & node_name, const std::string & node_namespace,
+    const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
+
   BaseNode(rclcpp::Node::SharedPtr node);
 
 private:
@@ -59,28 +56,28 @@ private:
   rclcpp::Publisher<MapMsg>::SharedPtr map_publisher_;
   rclcpp::TimerBase::SharedPtr timer_of_recv_;
 
-  template <typename... Args>
+  template<typename ... Args>
   static MapDataItr fill_map_lines(MapDataItr itr, int width, int height, Args... args);
 
-  template <typename... Args>
+  template<typename ... Args>
   static MapDataItr fill_map_lines_millor(MapDataItr itr, int width, int height, Args... args);
 
-  template <typename... Args>
+  template<typename ... Args>
   static MapDataItr fill_map_line(MapDataItr itr, int width, int begin, int end, Args... args);
 
   static MapDataItr fill_map_line(MapDataItr itr, int width);
 
-  template <typename... Args>
-  static MapDataItr fill_map_line_millor(MapDataItr itr, int width, int begin, int end, Args... args);
+  template<typename ... Args>
+  static MapDataItr fill_map_line_millor(
+    MapDataItr itr, int width, int begin, int end, Args... args);
 
   static MapDataItr fill_map_line_millor(MapDataItr itr, int width);
 
-
   void receive();
 
-  void publish_vision_detection(const QByteArray& recv_byte_arr);
+  void publish_vision_detection(const QByteArray & recv_byte_arr);
 };
 
-} // namespace kiks::ssl_vision_bridge
+}  // namespace kiks::ssl_vision_bridge
 
-#endif // #ifndef KIKS_SSL_VISION_BRIDGE_BASE_NODE_HPP_
+#endif  // #ifndef KIKS_SSL_VISION_BRIDGE_BASE_NODE_HPP_

@@ -31,18 +31,16 @@ class BallNode : public RosNodeBase
 {
 public:
   static std::string default_name();
-  
-  BallNode(const rclcpp::NodeOptions &options = rclcpp::NodeOptions());
+
+  BallNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
 
   BallNode(
-    const std::string &node_name,
-    const rclcpp::NodeOptions &options = rclcpp::NodeOptions());
+    const std::string & node_name, const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
 
   BallNode(
-    const std::string &node_name,
-    const std::string &node_namespace,
-    const rclcpp::NodeOptions &options = rclcpp::NodeOptions());
-    
+    const std::string & node_name, const std::string & node_namespace,
+    const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
+
   BallNode(rclcpp::Node::SharedPtr node);
 
 private:
@@ -64,6 +62,6 @@ private:
   rclcpp::Subscription<VisionDetectionMsg>::SharedPtr vision_detection_subscription_;
 };
 
-} // namespace kiks::ssl_vision_bridge
+}  // namespace kiks::ssl_vision_bridge
 
-#endif // #ifndef KIKS_SSL_VISION_BRIDGE_BALL_NODE_HPP_
+#endif  // #ifndef KIKS_SSL_VISION_BRIDGE_BALL_NODE_HPP_

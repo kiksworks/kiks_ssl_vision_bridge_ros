@@ -22,38 +22,43 @@
 namespace kiks::ssl_vision_bridge
 {
 
-template <class BaseNode>
+template<class BaseNode>
 class MultiNode : public RosNodeBase
 {
 public:
-  MultiNode(const rclcpp::NodeOptions &options = rclcpp::NodeOptions()) :
-    MultiNode(std::make_shared<rclcpp::Node>(BaseNode::default_name(), options)) {}
-  
-  MultiNode(
-    const std::string &node_name,
-    const rclcpp::NodeOptions &options = rclcpp::NodeOptions()) :
-    MultiNode(std::make_shared<rclcpp::Node>(node_name, options)) {}
+  MultiNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions())
+  : MultiNode(std::make_shared<rclcpp::Node>(BaseNode::default_name(), options))
+  {
+  }
 
   MultiNode(
-    const std::string &node_name,
-    const std::string &node_namespace,
-    const rclcpp::NodeOptions &options = rclcpp::NodeOptions()) :
-    MultiNode(std::make_shared<rclcpp::Node>(node_name, options)) {}
-    
-  MultiNode(rclcpp::Node::SharedPtr node) :
-    RosNodeBase(std::move(node))
+    const std::string & node_name, const rclcpp::NodeOptions & options = rclcpp::NodeOptions())
+  : MultiNode(std::make_shared<rclcpp::Node>(node_name, options))
   {
-    this->add_parameter<std::vector<std::string>>("namespaces", std::vector<std::string>(), [this](const auto& param){
-      for(const auto& sub_namespace : param.as_string_array()) {
-        base_node_list_.emplace_back(node_->create_sub_node(sub_namespace));
-      }
-    });
+  }
+
+  MultiNode(
+    const std::string & node_name, const std::string & node_namespace,
+    const rclcpp::NodeOptions & options = rclcpp::NodeOptions())
+  : MultiNode(std::make_shared<rclcpp::Node>(node_name, options))
+  {
+  }
+
+  MultiNode(rclcpp::Node::SharedPtr node)
+  : RosNodeBase(std::move(node))
+  {
+    this->add_parameter<std::vector<std::string>>(
+      "namespaces", std::vector<std::string>(), [this](const auto & param) {
+        for (const auto & sub_namespace : param.as_string_array()) {
+          base_node_list_.emplace_back(node_->create_sub_node(sub_namespace));
+        }
+      });
   }
 
 private:
   std::list<BaseNode> base_node_list_;
 };
 
-} // namespace kiks::ssl_vision_bridge
+}  // namespace kiks::ssl_vision_bridge
 
-#endif // #ifndef KIKS_SSL_VISION_BRIDGE_MULTI_NODE_HPP_
+#endif  // #ifndef KIKS_SSL_VISION_BRIDGE_MULTI_NODE_HPP_
