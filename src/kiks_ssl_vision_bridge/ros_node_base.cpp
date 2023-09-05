@@ -75,6 +75,7 @@ rcl_interfaces::msg::SetParametersResult RosNodeBase::set_parameters(
       set_param_func_map_.at(parameter.get_name())(parameter);
     } catch (const std::out_of_range &) {
       // mapになかったら設定を行わない
+      continue;
     } catch (const rclcpp::exceptions::InvalidParameterValueException & e) {
       // パラメータ設定時にROSのイベント例外が発生した場合
       error_handle(parameter.get_name() + " : ros error : " + e.what());

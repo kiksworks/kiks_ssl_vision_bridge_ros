@@ -20,6 +20,7 @@
 #include <cstddef>
 
 #include "QNetworkDatagram"
+
 #include "messages_robocup_ssl_wrapper.pb.h"
 
 namespace kiks::ssl_vision_bridge

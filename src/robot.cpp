@@ -14,10 +14,11 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#include "kiks_ssl_vision_bridge/base_node.hpp"
-#include "kiks_ssl_vision_bridge/robot_node.hpp"
 #include "rclcpp/context.hpp"
 #include "rclcpp/executors/single_threaded_executor.hpp"
+
+#include "kiks_ssl_vision_bridge/base_node.hpp"
+#include "kiks_ssl_vision_bridge/robot_node.hpp"
 
 int main(int argc, char * argv[])
 {

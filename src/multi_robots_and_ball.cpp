@@ -14,19 +14,19 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#include "kiks_ssl_vision_bridge/ball_node.hpp"
-#include "kiks_ssl_vision_bridge/base_node.hpp"
-#include "kiks_ssl_vision_bridge/multi_node.hpp"
-#include "kiks_ssl_vision_bridge/robot_node.hpp"
 #include "rclcpp/context.hpp"
 #include "rclcpp/executors/single_threaded_executor.hpp"
+
+#include "kiks_ssl_vision_bridge/ball_node.hpp"
+#include "kiks_ssl_vision_bridge/base_node.hpp"
+#include "kiks_ssl_vision_bridge/multi_robots_node.hpp"
 
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::executors::SingleThreadedExecutor exec;
   kiks::ssl_vision_bridge::BaseNode base_node;
-  kiks::ssl_vision_bridge::MultiNode<kiks::ssl_vision_bridge::RobotNode> robots_node;
+  kiks::ssl_vision_bridge::MultiRobotsNode robots_node;
   kiks::ssl_vision_bridge::BallNode ball_node;
   exec.add_node(base_node);
   exec.add_node(robots_node);
