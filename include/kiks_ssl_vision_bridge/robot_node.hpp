@@ -52,15 +52,15 @@ private:
   using PoseMsg = geometry_msgs::msg::PoseStamped;
   using TfMsg = geometry_msgs::msg::TransformStamped;
 
+  template<bool kTfEnable>
+  void extract(VisionDetectionMsg::ConstSharedPtr vision_detection_msg);
+
   bool team_is_yellow_;
   int robot_id_;
-  bool tf_enable_;
   TfMsg tf_msg_;
   rclcpp::Publisher<PoseMsg>::SharedPtr robot_publisher_;
   std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
   rclcpp::Subscription<VisionDetectionMsg>::SharedPtr vision_detection_subscription_;
-
-  void convert(VisionDetectionMsg::ConstSharedPtr vision_detection_msg);
 };
 
 }  // namespace kiks::ssl_vision_bridge
