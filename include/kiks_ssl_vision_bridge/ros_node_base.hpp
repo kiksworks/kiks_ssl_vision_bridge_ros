@@ -57,9 +57,9 @@ private:
     std::vector<rclcpp::Parameter> parameters);
 
 #ifdef KIKS_ROS_DISTRO_DASHING
-  OnParametersSetCallbackType on_set_parameters_callback_handle_;
+   rclcpp::Node::OnParametersSetCallbackType on_set_parameters_callback_handle_;
 #else
-  rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr
+  rclcpp::Node::OnSetParametersCallbackHandle::SharedPtr
     on_set_parameters_callback_handle_;
 #endif
 };
