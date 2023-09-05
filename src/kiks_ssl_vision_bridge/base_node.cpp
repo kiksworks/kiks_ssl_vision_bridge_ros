@@ -71,7 +71,9 @@ BaseNode::BaseNode(rclcpp::Node::SharedPtr node)
   this->add_parameter<double>(
     "map.wall_width", 0.1, [this](const auto & param) {map_wall_width_ = param.as_double();});
   this->add_parameter<std::string>(
-    "map.frame_id", "map", [this](const auto & param) {map_msg_.header.frame_id = param.as_string();});
+    "map.frame_id", "map", [this](const auto & param) {
+      map_msg_.header.frame_id = param.as_string();
+    });
 
   vision_detection_publisher_ =
     node_->create_publisher<VisionDetectionMsg>("vision_detection", rclcpp::QoS(4).best_effort());
