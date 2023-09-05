@@ -13,10 +13,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef KIKS_SSL_VISION_BRIDGE__MULTI_ROBOTS_HPP_
-#define KIKS_SSL_VISION_BRIDGE__MULTI_ROBOTS_HPP_
+#ifndef KIKS_SSL_VISION_BRIDGE__MULTI_ROBOTS_NODE_HPP_
+#define KIKS_SSL_VISION_BRIDGE__MULTI_ROBOTS_NODE_HPP_
 
 #include <memory>
+#include <string>
 
 #include "kiks_ssl_vision_bridge/multi_node.hpp"
 #include "kiks_ssl_vision_bridge/robot_node.hpp"
@@ -47,4 +48,4 @@ private:
 
 }  // namespace kiks::ssl_vision_bridge
 
-#endif  // KIKS_SSL_VISION_BRIDGE__MULTI_ROBOTS_HPP_
+#endif  // KIKS_SSL_VISION_BRIDGE__MULTI_ROBOTS_NODE_HPP_
