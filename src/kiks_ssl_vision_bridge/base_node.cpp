@@ -71,7 +71,7 @@ BaseNode::BaseNode(rclcpp::Node::SharedPtr node)
   this->add_parameter<double>(
     "map.wall_width", 0.1, [this](const auto & param) {map_wall_width_ = param.as_double();});
   this->add_parameter<std::string>(
-    "map.frame_id", "map", [this](const auto & param) {map_frame_id_ = param.as_string();});
+    "map.frame_id", "map", [this](const auto & param) {map_msg_.header.frame_id = param.as_string();});
 
   vision_detection_publisher_ =
     node_->create_publisher<VisionDetectionMsg>("vision_detection", rclcpp::QoS(4).best_effort());
@@ -163,16 +163,16 @@ void BaseNode::publish_vision_detection(const QByteArray & recv_byte_arr)
   if (packet.has_detection()) {
     const auto & detection = packet.detection();
 
-    VisionDetectionMsg vision_detection_msg;
-    vision_detection_msg.header.stamp = now;
-    vision_detection_msg.header.frame_id = map_frame_id_;
+    auto vision_detection_msg = std::make_unique<VisionDetectionMsg>();
+    vision_detection_msg->header.stamp = now;
+    vision_detection_msg->header.frame_id = map_msg_.header.frame_id;
 
     for (const auto & ball : detection.balls()) {
       PointMsg ball_msg;
       ball_msg.x = ball.x() * 0.001;
       ball_msg.y = ball.y() * 0.001;
       ball_msg.z = ball.z() * 0.001;
-      vision_detection_msg.balls.push_back(ball_msg);
+      vision_detection_msg->balls.push_back(ball_msg);
     }
 
     auto convert_robots = [](const auto & robots, auto & robots_msg) {
@@ -188,15 +188,14 @@ void BaseNode::publish_vision_detection(const QByteArray & recv_byte_arr)
         }
       };
 
-    convert_robots(detection.robots_yellow(), vision_detection_msg.yellow_robots);
-    convert_robots(detection.robots_blue(), vision_detection_msg.blue_robots);
+    convert_robots(detection.robots_yellow(), vision_detection_msg->yellow_robots);
+    convert_robots(detection.robots_blue(), vision_detection_msg->blue_robots);
 
-    vision_detection_publisher_->publish(vision_detection_msg);
+    vision_detection_publisher_->publish(std::move(vision_detection_msg));
   }
 
   if (map_publisher_ && packet.has_geometry()) {
     map_msg_.header.stamp = now;
-    map_msg_.header.frame_id = map_frame_id_;
     const auto & field = packet.geometry().field();
     map_msg_.info.map_load_time = now;
     auto width =

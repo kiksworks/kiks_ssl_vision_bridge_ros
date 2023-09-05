@@ -24,8 +24,10 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::executors::SingleThreadedExecutor exec;
-  kiks::ssl_vision_bridge::BaseNode base_node;
-  kiks::ssl_vision_bridge::RobotNode robot_node;
+  rclcpp::NodeOptions option;
+  option.use_intra_process_comms(true);
+  kiks::ssl_vision_bridge::BaseNode base_node(option);
+  kiks::ssl_vision_bridge::RobotNode robot_node(option);
   exec.add_node(base_node);
   exec.add_node(robot_node);
   exec.spin();
