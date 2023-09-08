@@ -24,7 +24,7 @@ namespace kiks::ssl_vision_bridge
 
 using namespace std::chrono_literals;
 
-std::string BallNode::default_name() {return "ssl_bridge_vision_ball";}
+std::string BallNode::default_name() {return "ssl_vision_bridge_ball";}
 
 BallNode::BallNode(const rclcpp::NodeOptions & options)
 : BallNode(std::make_shared<rclcpp::Node>(default_name(), options))

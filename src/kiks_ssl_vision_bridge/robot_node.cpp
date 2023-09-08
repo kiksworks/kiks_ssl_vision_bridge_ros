@@ -21,7 +21,7 @@ namespace kiks::ssl_vision_bridge
 
 using namespace std::chrono_literals;
 
-std::string RobotNode::default_name() {return "ssl_bridge_vision_robot";}
+std::string RobotNode::default_name() {return "ssl_vision_bridge_robot";}
 
 RobotNode::RobotNode(const rclcpp::NodeOptions & options)
 : RobotNode(std::make_shared<rclcpp::Node>(default_name(), options))

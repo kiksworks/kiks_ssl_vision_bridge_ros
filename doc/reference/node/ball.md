@@ -3,7 +3,7 @@
 ## Description
 Receive vision_detection topic, extract ball pose and publish.
 
-default name : ssl_bridge_vision_ball
+default name : ssl_vision_bridge_ball
 
 ## Parameters
 

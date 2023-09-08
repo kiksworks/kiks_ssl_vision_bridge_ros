@@ -23,7 +23,7 @@ namespace kiks::ssl_vision_bridge
 
 using namespace std::chrono_literals;
 
-std::string MultiRobotsNode::default_name() {return "ssl_bridge_vision_multi_robots";}
+std::string MultiRobotsNode::default_name() {return "ssl_vision_bridge_multi_robots";}
 
 MultiRobotsNode::MultiRobotsNode(const rclcpp::NodeOptions & options)
 : MultiRobotsNode(std::make_shared<rclcpp::Node>(default_name(), options))

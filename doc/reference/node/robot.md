@@ -3,7 +3,7 @@
 ## Description
 Receive vision_detection topic, extract robot pose and publish.
 
-default name : ssl_bridge_vision_robot
+default name : ssl_vision_bridge_robot
 
 ## Parameters
 

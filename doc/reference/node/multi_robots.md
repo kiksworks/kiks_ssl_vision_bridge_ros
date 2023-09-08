@@ -3,7 +3,7 @@
 ## Description
 Receive vision_detection topic, extract multi robots pose and publish.
 
-default name : ssl_bridge_vision_multi_robots
+default name : ssl_vision_bridge_multi_robots
 
 ## Sub Node
 - [robot](robot.md)
