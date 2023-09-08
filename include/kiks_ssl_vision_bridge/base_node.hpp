@@ -79,7 +79,7 @@ private:
 
   void receive();
 
-  void publish_vision_detection(const QByteArray & recv_byte_arr);
+  inline void publish_vision_detection(const QByteArray & recv_byte_arr);
 };
 
 }  // namespace kiks::ssl_vision_bridge

@@ -55,9 +55,9 @@ private:
 
   void extract_with_tf(VisionDetectionMsg::ConstSharedPtr vision_detection_msg);
 
-  void publish_ball(VisionDetectionMsg::ConstSharedPtr vision_detection_msg);
+  inline void publish_ball(VisionDetectionMsg::ConstSharedPtr vision_detection_msg);
 
-  void broadcast_ball_tf(VisionDetectionMsg::ConstSharedPtr vision_detection_msg);
+  inline void broadcast_ball_tf(VisionDetectionMsg::ConstSharedPtr vision_detection_msg);
 
   TfMsg tf_msg_;
   rclcpp::Publisher<PointMsg>::SharedPtr ball_publisher_;

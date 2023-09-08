@@ -33,7 +33,7 @@ class RosNodeBase
 public:
   explicit RosNodeBase(rclcpp::Node::SharedPtr node);
 
-  operator rclcpp::Node::SharedPtr() {return node_;}
+  inline operator rclcpp::Node::SharedPtr() const noexcept {return node_;}
 
 protected:
   using SetParamFunc = std::function<void (const rclcpp::Parameter &)>;
