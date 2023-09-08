@@ -22,19 +22,6 @@
 namespace kiks::ssl_vision_bridge
 {
 
-template<class T>
-T declare_parameter_if_not_set(
-  rclcpp::Node::SharedPtr node, const std::string & name, const T & default_value,
-  const std::string & parameter_namespace = "")
-{
-  auto value = node->has_parameter(name) ? node->get_parameter(name).get_value<T>() :
-    node->declare_parameter<T>(name, default_value);
-  if (!parameter_namespace.empty()) {
-    value = declare_parameter_if_not_set(node, parameter_namespace + "." + name, value);
-  }
-  return value;
-}
-
 using namespace std::chrono_literals;
 
 std::string BallNode::default_name() {return "ssl_bridge_vision_ball";}
