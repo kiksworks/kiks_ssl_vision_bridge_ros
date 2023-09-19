@@ -11,14 +11,14 @@
 - [ball_node](class/ball_node.md)
 
 ### node
-- [base](node/base)
-- [robot](node/robot)
-- [multi_robots](node/multi_robots)
-- [ball](node/ball)
+- [base](node/base.md)
+- [robot](node/robot.md)
+- [multi_robots](node/multi_robots.md)
+- [ball](node/ball.md)
 
 ### executor
-- [base](executor/base)
-- [robot](executor/robot)
-- [multi_robots](executor/multi_robots)
-- [ball](executor/ball)
-- [multi_robots_and_ball](executor/multi_robots_and_ball)
+- [base](executor/base.md)
+- [robot](executor/robot.md)
+- [multi_robots](executor/multi_robots.md)
+- [ball](executor/ball.md)
+- [multi_robots_and_ball](executor/multi_robots_and_ball.md)
