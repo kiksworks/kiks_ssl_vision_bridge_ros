@@ -6,7 +6,6 @@ set(ros2_required_packages
   rclcpp
   geometry_msgs
   nav_msgs
-  std_msgs
   tf2_ros)
 
 foreach(ros2_required_package IN LISTS ros2_required_packages)
@@ -82,14 +81,6 @@ target_include_directories(${PROJECT_NAME}_lib
   INTERFACE include
 )
 
-# generate msg library
-file(GLOB msg_files
-  LIST_DIRECTORIES false
-  RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-  "msg/*")
-
-rosidl_generate_interfaces(${PROJECT_NAME} ${msg_files} DEPENDENCIES geometry_msgs)
-
 #link all liblary to source liblary
 target_link_libraries(${PROJECT_NAME}_lib ${PROJECT_NAME}_proto_lib)
 if(Qt6_FOUND)
@@ -99,13 +90,6 @@ else()
 endif()
 
 ament_target_dependencies(${PROJECT_NAME}_lib ${ros2_required_packages})
-if($ENV{ROS_DISTRO} MATCHES "humble")
-  rosidl_get_typesupport_target(cpp_typesupport_target ${PROJECT_NAME} rosidl_typesupport_cpp)
-  target_link_libraries(${PROJECT_NAME}_lib ${cpp_typesupport_target})
-else()
-  rosidl_target_interfaces(${PROJECT_NAME}_lib
-    ${PROJECT_NAME} "rosidl_typesupport_cpp")
-endif()
 
 # generate executor
 file(GLOB executor_files
