@@ -35,8 +35,8 @@ note : This parameter is false by default to prevent communication between multi
 - [robot_node](../class/robot_node.md)
 
 ### executor
-- [robot](../executor/robot)
-- [multi_robots](../executor/multi_robots)
-- [multi_robots_and_ball](../executor/multi_robots_and_ball)
+- [robot](../executor/robot.md)
+- [multi_robots](../executor/multi_robots.md)
+- [multi_robots_and_ball](../executor/multi_robots_and_ball.md)
 
 ###### &copy; 2023 KIKS

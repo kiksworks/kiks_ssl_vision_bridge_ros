@@ -25,6 +25,6 @@ note : This parameter is false by default to prevent communication between multi
 - [ball_node](../class/ball_node.md)
 
 ### executor
-- [ball](../executor/ball)
+- [ball](../executor/ball.md)
 
 ###### &copy; 2023 KIKS
