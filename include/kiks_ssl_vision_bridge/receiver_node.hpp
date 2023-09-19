@@ -21,6 +21,7 @@
 #include <memory>
 #include <string>
 
+#include "QNetworkInterface"
 #include "QUdpSocket"
 
 #include "kiks_ssl_vision_bridge/ball_publisher_node.hpp"
@@ -54,6 +55,8 @@ private:
   void check_receiving();
 
   QUdpSocket udp_socket_;
+  QHostAddress udp_address_;
+  QNetworkInterface udp_interface_;
   std::list<RobotPublisherNode> yellow_robot_publisher_nodes_, blue_robot_publisher_nodes_;
   std::unique_ptr<BallPublisherNode> ball_publisher_node_;
   std::unique_ptr<MapPublisherNode> map_publisher_node_;

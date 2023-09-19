@@ -51,13 +51,23 @@ ReceiverNode::ReceiverNode(rclcpp::Node::SharedPtr node)
   this->add_parameter<std::int64_t>(
     "udp.port", 10006, [this](const auto & param) {
       udp_socket_.bind(QHostAddress::AnyIPv4, param.as_int());
+      udp_socket_.joinMulticastGroup(udp_address_, udp_interface_);
     });
   // Parameter of ssl-vision udp multicast ip
   this->add_parameter<std::string>(
     "udp.address", "224.5.23.2", [this](const auto & param) {
-      udp_socket_.joinMulticastGroup(QHostAddress(param.as_string().c_str()));
+      udp_address_ = QHostAddress(param.as_string().c_str());
+      udp_socket_.joinMulticastGroup(udp_address_);
     });
-
+  // Parameter of ssl-vision udp multicast interface
+  this->add_parameter<std::string>(
+    "udp.interface", "", [this](const auto & param) {
+      udp_interface_ = QNetworkInterface::interfaceFromName(param.as_string().c_str());
+      if(param.as_string() != "" && !udp_interface_.isValid()) {
+        RCLCPP_WARN(node_->get_logger(), "\"%s\" is an invalid interface (use the default interface instead).", param.as_string().c_str());
+      }
+      udp_socket_.setMulticastInterface(udp_interface_);
+    });
   // Parameter of each team robots
   // Default is {"teamcolor0, teamcolor1 ... "teamcolor14", "teamcolor15"} for each team
   auto create_robots = [this](const std::string & base_name) {
