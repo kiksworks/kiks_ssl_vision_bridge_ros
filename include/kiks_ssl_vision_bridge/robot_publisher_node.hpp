@@ -48,7 +48,7 @@ public:
 
   explicit RobotPublisherNode(rclcpp::Node::SharedPtr node);
 
-  void publish_robot(const TimeMsg& stamp, const SSL_DetectionRobot& robot);
+  void publish_robot(const TimeMsg & stamp, const SSL_DetectionRobot & robot);
 
 private:
   using PoseMsg = geometry_msgs::msg::PoseStamped;

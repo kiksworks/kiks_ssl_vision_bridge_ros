@@ -28,7 +28,9 @@ BallPublisherNode::BallPublisherNode(const rclcpp::NodeOptions & options)
 {
 }
 
-BallPublisherNode::BallPublisherNode(const std::string & node_name, const rclcpp::NodeOptions & options)
+BallPublisherNode::BallPublisherNode(
+  const std::string & node_name,
+  const rclcpp::NodeOptions & options)
 : BallPublisherNode(std::make_shared<rclcpp::Node>(node_name, options))
 {
 }
@@ -57,7 +59,8 @@ BallPublisherNode::BallPublisherNode(rclcpp::Node::SharedPtr node)
   this->add_parameter<std::string>(
     "ball.frame_id", "vision/ball", [this, ns_with_slash](const auto & param) {
       auto str = param.as_string();
-      ball_publisher_ = node_->create_publisher<PointMsg>(ns_with_slash + str, this->get_dynamic_qos());
+      ball_publisher_ =
+      node_->create_publisher<PointMsg>(ns_with_slash + str, this->get_dynamic_qos());
       tf_msg_.child_frame_id = str;
     });
 
@@ -69,14 +72,14 @@ BallPublisherNode::BallPublisherNode(rclcpp::Node::SharedPtr node)
     });
 }
 
-void BallPublisherNode::publish_ball(const TimeMsg& stamp, const SSL_DetectionBall& ball)
+void BallPublisherNode::publish_ball(const TimeMsg & stamp, const SSL_DetectionBall & ball)
 {
   ball_msg_.header.stamp = stamp;
   ball_msg_.point.x = ball.x() * 0.001;
   ball_msg_.point.y = ball.y() * 0.001;
   ball_msg_.point.z = ball.z() * 0.001;
   ball_publisher_->publish(ball_msg_);
-  if(tf_broadcaster_) {
+  if (tf_broadcaster_) {
     tf_msg_.header.stamp = stamp;
     tf_msg_.transform.translation.x = ball_msg_.point.x;
     tf_msg_.transform.translation.y = ball_msg_.point.y;

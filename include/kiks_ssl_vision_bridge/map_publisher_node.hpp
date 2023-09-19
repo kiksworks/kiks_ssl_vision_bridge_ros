@@ -18,6 +18,7 @@
 #define KIKS_SSL_VISION_BRIDGE__MAP_PUBLISHER_NODE_HPP_
 
 #include <string>
+#include <vector>
 
 #include "nav_msgs/msg/occupancy_grid.hpp"
 
@@ -43,7 +44,7 @@ public:
 
   explicit MapPublisherNode(rclcpp::Node::SharedPtr node);
 
-  void publish_map(const TimeMsg& stamp, const SSL_GeometryFieldSize& field);
+  void publish_map(const TimeMsg & stamp, const SSL_GeometryFieldSize & field);
 
 private:
   using MapMsg = nav_msgs::msg::OccupancyGrid;
@@ -57,10 +58,14 @@ private:
   static inline MapDataItr fill_map_lines(MapDataItr itr, int width, int height, Args... args);
 
   template<typename ... Args>
-  static inline MapDataItr fill_map_lines_millor(MapDataItr itr, int width, int height, Args... args);
+  static inline MapDataItr fill_map_lines_millor(
+    MapDataItr itr, int width, int height,
+    Args... args);
 
   template<typename ... Args>
-  static inline MapDataItr fill_map_line(MapDataItr itr, int width, int begin, int end, Args... args);
+  static inline MapDataItr fill_map_line(
+    MapDataItr itr, int width, int begin, int end,
+    Args... args);
 
   static inline MapDataItr fill_map_line(MapDataItr itr, int width);
 

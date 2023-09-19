@@ -48,7 +48,7 @@ public:
 
   explicit BallPublisherNode(rclcpp::Node::SharedPtr node);
 
-  void publish_ball(const TimeMsg& stamp, const SSL_DetectionBall& ball);
+  void publish_ball(const TimeMsg & stamp, const SSL_DetectionBall & ball);
 
 private:
   using PointMsg = geometry_msgs::msg::PointStamped;

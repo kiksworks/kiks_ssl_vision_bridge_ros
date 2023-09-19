@@ -26,7 +26,9 @@ RobotPublisherNode::RobotPublisherNode(const rclcpp::NodeOptions & options)
 {
 }
 
-RobotPublisherNode::RobotPublisherNode(const std::string & node_name, const rclcpp::NodeOptions & options)
+RobotPublisherNode::RobotPublisherNode(
+  const std::string & node_name,
+  const rclcpp::NodeOptions & options)
 : RobotPublisherNode(std::make_shared<rclcpp::Node>(node_name, options))
 {
 }
@@ -60,7 +62,7 @@ RobotPublisherNode::RobotPublisherNode(rclcpp::Node::SharedPtr node)
     "robot.frame_id", "vision/base_footprint", [this, tf_namespace](const auto & param) {
       auto str = param.as_string();
       robot_publisher_ =
-        node_->create_publisher<PoseMsg>(str, this->get_dynamic_qos());
+      node_->create_publisher<PoseMsg>(str, this->get_dynamic_qos());
       tf_msg_.child_frame_id = tf_namespace + param.as_string();
     });
   // Parameter of map frame_id
@@ -71,7 +73,7 @@ RobotPublisherNode::RobotPublisherNode(rclcpp::Node::SharedPtr node)
     });
 }
 
-void RobotPublisherNode::publish_robot(const TimeMsg& stamp, const SSL_DetectionRobot& robot)
+void RobotPublisherNode::publish_robot(const TimeMsg & stamp, const SSL_DetectionRobot & robot)
 {
   if (static_cast<decltype(robot_id_)>(robot.robot_id()) != robot_id_) {
     return;
@@ -88,7 +90,7 @@ void RobotPublisherNode::publish_robot(const TimeMsg& stamp, const SSL_Detection
   pose_msg_.pose.orientation.w = std::cos(theta);
   robot_publisher_->publish(pose_msg_);
 
-  if(tf_broadcaster_) {
+  if (tf_broadcaster_) {
     tf_msg_.header.stamp = stamp;
     tf_msg_.transform.translation.x = pose_msg_.pose.position.x;
     tf_msg_.transform.translation.y = pose_msg_.pose.position.y;

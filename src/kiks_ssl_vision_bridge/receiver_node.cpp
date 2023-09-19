@@ -57,10 +57,10 @@ ReceiverNode::ReceiverNode(rclcpp::Node::SharedPtr node)
     "udp.address", "224.5.23.2", [this](const auto & param) {
       udp_socket_.joinMulticastGroup(QHostAddress(param.as_string().c_str()));
     });
-  
+
   // Parameter of each team robots
   // Default is {"teamcolor0, teamcolor1 ... "teamcolor14", "teamcolor15"} for each team
-  auto create_robots = [this](const std::string& base_name) {
+  auto create_robots = [this](const std::string & base_name) {
       std::vector<std::string> namespaces;
       for (int i = 0; i < 16; ++i) {
         auto ns = base_name + std::to_string(i);
@@ -69,34 +69,37 @@ ReceiverNode::ReceiverNode(rclcpp::Node::SharedPtr node)
       }
       return namespaces;
     };
-  this->add_parameter<std::vector<std::string>>("yellow_robots", create_robots("yellow"), [this](const auto & param) {
-    yellow_robot_publisher_nodes_.clear();
-    for(auto str : param.as_string_array()) {
-      yellow_robot_publisher_nodes_.emplace_back(node_->create_sub_node(str));
-    }
-  });
-  this->add_parameter<std::vector<std::string>>("blue_robots", create_robots("blue"), [this](const auto & param) {
-    blue_robot_publisher_nodes_.clear();
-    for(auto str : param.as_string_array()) {
-      blue_robot_publisher_nodes_.emplace_back(node_->create_sub_node(str));
-    }
-  });
+  this->add_parameter<std::vector<std::string>>(
+    "yellow_robots", create_robots("yellow"), [this](const auto & param) {
+      yellow_robot_publisher_nodes_.clear();
+      for (auto str : param.as_string_array()) {
+        yellow_robot_publisher_nodes_.emplace_back(node_->create_sub_node(str));
+      }
+    });
+  this->add_parameter<std::vector<std::string>>(
+    "blue_robots", create_robots("blue"), [this](const auto & param) {
+      blue_robot_publisher_nodes_.clear();
+      for (auto str : param.as_string_array()) {
+        blue_robot_publisher_nodes_.emplace_back(node_->create_sub_node(str));
+      }
+    });
   // Parameter of ball publisher enable
   this->add_parameter<bool>(
     "ball.enable", true, [this](const auto & param) {
       ball_publisher_node_ = param.as_bool() ?
-        std::make_unique<BallPublisherNode>(node_->create_sub_node("ball")) :
-        std::unique_ptr<BallPublisherNode>();
+      std::make_unique<BallPublisherNode>(node_->create_sub_node("ball")) :
+      std::unique_ptr<BallPublisherNode>();
     });
   // Parameter of map publisher enable
   this->add_parameter<bool>(
     "map.enable", true, [this](const auto & param) {
       map_publisher_node_ = param.as_bool() ?
-        std::make_unique<MapPublisherNode>(node_->create_sub_node("map")) :
-        std::unique_ptr<MapPublisherNode>();
+      std::make_unique<MapPublisherNode>(node_->create_sub_node("map")) :
+      std::unique_ptr<MapPublisherNode>();
     });
   // Set timer to check reception
-  receiving_admin_timer_ = node_->create_wall_timer(10ms, std::bind(&ReceiverNode::check_receiving, this));
+  receiving_admin_timer_ =
+    node_->create_wall_timer(10ms, std::bind(&ReceiverNode::check_receiving, this));
 }
 
 void ReceiverNode::check_receiving()
@@ -130,16 +133,17 @@ void ReceiverNode::check_receiving()
       continue;
     }
     // Publish detection
-    if(packet.has_detection()) {
-      const auto& detection = packet.detection();
+    if (packet.has_detection()) {
+      const auto & detection = packet.detection();
       // Time stamp calculation.
       // The time taken for ssl-vision processing is added to the current time.
-      const std::uint64_t delay_ns = (detection.t_sent() - detection.t_capture()) * (0.001 * 0.001 * 0.001);
+      const std::uint64_t delay_ns = (detection.t_sent() - detection.t_capture()) *
+        (0.001 * 0.001 * 0.001);
       const TimeMsg stamp = now + std::chrono::nanoseconds(delay_ns);
       // Run all robot publishers
-      const auto publish_robots = [&stamp](auto& nodes, const auto& robots) {
-          for(const auto& robot : robots) {
-            for(auto& node : nodes) {
+      const auto publish_robots = [&stamp](auto & nodes, const auto & robots) {
+          for (const auto & robot : robots) {
+            for (auto & node : nodes) {
               node.publish_robot(stamp, robot);
             }
           }
@@ -147,12 +151,12 @@ void ReceiverNode::check_receiving()
       publish_robots(yellow_robot_publisher_nodes_, detection.robots_yellow());
       publish_robots(blue_robot_publisher_nodes_, detection.robots_blue());
       // Run ball publisher
-      if(ball_publisher_node_ && detection.balls().size() >= 1) {
+      if (ball_publisher_node_ && detection.balls().size() >= 1) {
         ball_publisher_node_->publish_ball(stamp, detection.balls(0));
       }
     }
     // Publish geometry
-    if(map_publisher_node_ && packet.has_geometry()) {
+    if (map_publisher_node_ && packet.has_geometry()) {
       map_publisher_node_->publish_map(now, packet.geometry().field());
     }
     // Reset timer

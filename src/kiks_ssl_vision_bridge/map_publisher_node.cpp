@@ -26,7 +26,9 @@ MapPublisherNode::MapPublisherNode(const rclcpp::NodeOptions & options)
 {
 }
 
-MapPublisherNode::MapPublisherNode(const std::string & node_name, const rclcpp::NodeOptions & options)
+MapPublisherNode::MapPublisherNode(
+  const std::string & node_name,
+  const rclcpp::NodeOptions & options)
 : MapPublisherNode(std::make_shared<rclcpp::Node>(node_name, options))
 {
 }
@@ -47,18 +49,20 @@ MapPublisherNode::MapPublisherNode(rclcpp::Node::SharedPtr node)
     });
   this->add_parameter<double>(
     "map.wall_width", 0.02, [this](const auto & param) {map_wall_width_ = param.as_double();});
-  
+
   const std::string ns = node_->get_namespace();
   const std::string ns_with_slash = ns.back() == '/' ? ns : ns + '/';
   this->add_parameter<std::string>(
     "map.frame_id", "map", [this, ns_with_slash](const auto & param) {
       const auto str = param.as_string();
       map_msg_.header.frame_id = str;
-      map_publisher_ = node_->create_publisher<MapMsg>(ns_with_slash + str, this->get_dynamic_qos());
+      map_publisher_ = node_->create_publisher<MapMsg>(
+        ns_with_slash + str,
+        this->get_dynamic_qos());
     });
 }
 
-void MapPublisherNode::publish_map(const TimeMsg& stamp, const SSL_GeometryFieldSize& field)
+void MapPublisherNode::publish_map(const TimeMsg & stamp, const SSL_GeometryFieldSize & field)
 {
   map_msg_.header.stamp = stamp;
   map_msg_.info.map_load_time = stamp;
@@ -92,7 +96,9 @@ void MapPublisherNode::publish_map(const TimeMsg& stamp, const SSL_GeometryField
 }
 
 template<typename ... Args>
-MapPublisherNode::MapDataItr MapPublisherNode::fill_map_lines(MapDataItr itr, int width, int height, Args... args)
+MapPublisherNode::MapDataItr MapPublisherNode::fill_map_lines(
+  MapDataItr itr, int width, int height,
+  Args... args)
 {
   auto itr_end = itr + height * width;
   while (itr < itr_end) {
@@ -120,7 +126,10 @@ MapPublisherNode::MapDataItr MapPublisherNode::fill_map_line(
   return fill_map_line(itr, width, args ...);
 }
 
-MapPublisherNode::MapDataItr MapPublisherNode::fill_map_line(MapDataItr itr, int width) {return itr + width;}
+MapPublisherNode::MapDataItr MapPublisherNode::fill_map_line(MapDataItr itr, int width)
+{
+  return itr + width;
+}
 
 template<typename ... Args>
 MapPublisherNode::MapDataItr MapPublisherNode::fill_map_line_millor(

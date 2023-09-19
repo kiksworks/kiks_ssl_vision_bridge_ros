@@ -13,7 +13,6 @@ foreach(ros2_required_package IN LISTS ros2_required_packages)
 endforeach()
 
 find_package(ament_cmake REQUIRED)
-find_package(rosidl_default_generators REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(Qt6 QUIET)
 if(Qt6_FOUND)
