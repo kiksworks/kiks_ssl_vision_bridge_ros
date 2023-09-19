@@ -36,6 +36,16 @@ RosNodeBase::RosNodeBase(rclcpp::Node::SharedPtr node)
 #endif
 }
 
+rclcpp::QoS RosNodeBase::get_dynamic_qos()
+{
+  return rclcpp::QoS(1).best_effort().durability_volatile();
+}
+
+rclcpp::QoS RosNodeBase::get_static_qos()
+{
+  return rclcpp::QoS(1).reliable().transient_local();
+}
+
 template<typename T>
 void RosNodeBase::add_parameter(std::string name, T default_value, SetParamFunc set_param_func)
 {

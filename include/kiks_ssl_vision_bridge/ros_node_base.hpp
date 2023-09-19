@@ -38,6 +38,10 @@ public:
 protected:
   using SetParamFunc = std::function<void (const rclcpp::Parameter &)>;
 
+  static rclcpp::QoS get_dynamic_qos();
+
+  static rclcpp::QoS get_static_qos();
+
   template<typename T>
   void add_parameter(std::string name, T default_value, SetParamFunc set_param_func);
 
