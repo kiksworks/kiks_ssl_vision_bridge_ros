@@ -5,11 +5,13 @@
 kiks::ssl_vision_bridge::RosNodeBase
 
 #### inherited
-- [multi_node](multi_node.md)
-- [base_node](base_node.md)
-- [robot_node](robot_node.md)
-- [multi_robots_node](multi_robots_node.md)
-- [ball_node](ball_node.md)
+- [robot_publisher_node](robot_publisher_node.md)
+- [ball_publisher_node](ball_publisher_node.md)
+- [map_publisher_node](map_publisher_node.md)
+- [receiver_node](receiver_node.md)
+
+## Description
+- This is the base class for ROS node.
 
 ## public member function
 
@@ -23,6 +25,14 @@ kiks::ssl_vision_bridge::RosNodeBase
 
 #### using SetParamFunc = std::function&lt;void (const rclcpp::Parameter &)&gt;
 - Type of function called when parameter is set
+
+## protected non-member function
+
+#### static rclcpp::QoS get_dynamic_qos()
+- Returns the qos to use for dynamic topics.
+
+#### static rclcpp::QoS get_static_qos()
+- Returns the qos to use for static topics.
 
 ## protected member function
 

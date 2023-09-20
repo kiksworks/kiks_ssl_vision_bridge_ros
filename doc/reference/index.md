@@ -4,21 +4,16 @@
 
 ### class
 - [ros_node_base](class/ros_node_base.md)
-- [multi_node](class/multi_node.md)
-- [base_node](class/base_node.md)
-- [robot_node](class/robot_node.md)
-- [multi_robots_node](class/multi_robots_node.md)
-- [ball_node](class/ball_node.md)
+- [robot_publisher_node](robot_publisher_node.md)
+- [ball_publisher_node](ball_publisher_node.md)
+- [map_publisher_node](map_publisher_node.md)
+- [receiver_node](map_publisher_node.md)
 
 ### node
-- [base](node/base.md)
-- [robot](node/robot.md)
-- [multi_robots](node/multi_robots.md)
-- [ball](node/ball.md)
+- [robot_publisher](node/robot_publisher.md)
+- [ball_publisher](node/ball_publisher.md)
+- [map_publisher](node/map_publisher.md)
+- [receiver](node/receiver.md)
 
 ### executor
-- [base](executor/base.md)
-- [robot](executor/robot.md)
-- [multi_robots](executor/multi_robots.md)
-- [ball](executor/ball.md)
-- [multi_robots_and_ball](executor/multi_robots_and_ball.md)
+- [ssl_vision_bridge](executor/ssl_vision_bridge.md)
