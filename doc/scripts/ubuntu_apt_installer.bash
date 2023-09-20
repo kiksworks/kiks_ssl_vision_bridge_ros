@@ -17,9 +17,12 @@ then
     sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
     sudo apt update
+    sudo apt install python3-rosdep
+    source /opt/ros/dashing/setup.bash
+    sudo rosdep init
     cho "source /opt/ros/humble/setup.bash" >> ~/.bashrc
   fi
-  sudo apt install -y ros-humble-desktop ros-dev-tools python3-colcon-common-extensions python3-rosdep git libqt6network6 protobuf-compiler
+  sudo apt install -y ros-humble-desktop ros-dev-tools python3-colcon-common-extensions libqt6network6 protobuf-compiler
 elif [ "$(lsb_release -r)" == "Release:	20.04" ]
 then
   # setup ros2 foxy
@@ -32,9 +35,12 @@ then
     sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
     sudo apt update
+    sudo apt install python3-rosdep
+    source /opt/ros/dashing/setup.bash
+    sudo rosdep init
     echo "source /opt/ros/foxy/setup.bash" >> ~/.bashrc
   fi
-  sudo apt install -y ros-foxy-desktop ros-dev-tools python3-colcon-common-extensions python3-rosdep git libqt6network6 protobuf-compiler
+  sudo apt install -y ros-foxy-desktop ros-dev-tools python3-colcon-common-extensions git libqt6network6 protobuf-compiler
 elif [ "$(lsb_release -r)" == "Release:	18.04" ]
 then
   # setup ros2 dashing
@@ -45,11 +51,16 @@ then
     sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key  -o /usr/share/keyrings/ros-archive-keyring.gpg
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
     sudo apt update
+    sudo apt install python3-rosdep
+    source /opt/ros/dashing/setup.bash
+    sudo rosdep init
     echo "source /opt/ros/dashing/setup.bash" >> ~/.bashrc
   fi
-  sudo apt install -y ros-dashing-desktop python3-colcon-common-extensions python3-rosdep git libqt5network5 protobuf-compiler
+  sudo apt install -y ros-dashing-desktop python3-colcon-common-extensions git libqt5network5 protobuf-compiler
 else
   echo unsupported ubuntu rerease
   exit 255
 fi
+# rosdep
+rosdep install -i --from-paths "$(dirname "$0")"/../../.
   
