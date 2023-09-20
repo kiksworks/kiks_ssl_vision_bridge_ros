@@ -5,7 +5,7 @@ then
   exit 255
 fi
 # check ubuntu rerease
-if [ "$(lsb_release -r)" != "Release: 22.04" ]
+if [ "$(lsb_release -r)" == "Release:	22.04" ]
 then
   # setup ros2 foxy
   ls /opt/ros/humble > /dev/null
@@ -20,7 +20,7 @@ then
     cho "source /opt/ros/humble/setup.bash" >> ~/.bashrc
   fi
   sudo apt install -y ros-humble-desktop ros-dev-tools python3-colcon-common-extensions python3-rosdep git libqt6network6 protobuf-compiler
-elif [ "$(lsb_release -r)" != "Release: 20.04" ]
+elif [ "$(lsb_release -r)" == "Release:	20.04" ]
 then
   # setup ros2 foxy
   ls /opt/ros/foxy > /dev/null
@@ -35,7 +35,7 @@ then
     echo "source /opt/ros/foxy/setup.bash" >> ~/.bashrc
   fi
   sudo apt install -y ros-foxy-desktop ros-dev-tools python3-colcon-common-extensions python3-rosdep git libqt6network6 protobuf-compiler
-elif [ "$(lsb_release -r)" != "Release: 18.04" ]
+elif [ "$(lsb_release -r)" == "Release:	18.04" ]
 then
   # setup ros2 dashing
   ls /opt/ros/dashing > /dev/null
