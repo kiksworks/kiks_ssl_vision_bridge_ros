@@ -76,16 +76,17 @@ ReceiverNode::ReceiverNode(rclcpp::Node::SharedPtr node)
   auto create_robots_str = [this](const std::string & base_name) {
       std::vector<std::string> namespaces;
       for (int i = 0; i < 16; ++i) {
-        const auto ns = (i < 10) ? (base_name + "0" + std::to_string(i)) : (base_name + std::to_string(i));
+        const auto ns =
+          (i < 10) ? (base_name + "0" + std::to_string(i)) : (base_name + std::to_string(i));
         namespaces.push_back(ns);
       }
       return namespaces;
     };
   auto set_robots = [this](auto & robots, const std::vector<std::string> str_arr) {
       robots.clear();
-      for(std::uint32_t i = 0; i < str_arr.size(); ++i) {
-        const auto& str = str_arr[i];
-        if(str == "") {
+      for (std::uint32_t i = 0; i < str_arr.size(); ++i) {
+        const auto & str = str_arr[i];
+        if (str == "") {
           continue;
         }
         robots.emplace(i, node_->create_sub_node(str));
@@ -160,7 +161,7 @@ void ReceiverNode::check_receiving()
       const auto publish_robots = [&stamp](auto & nodes, const auto & robots) {
           for (const auto & robot : robots) {
             auto itr = nodes.find(robot.robot_id());
-            if(itr == nodes.end()) {
+            if (itr == nodes.end()) {
               continue;
             }
             itr->second.publish_robot(stamp, robot);
