@@ -76,7 +76,7 @@ ReceiverNode::ReceiverNode(rclcpp::Node::SharedPtr node)
   auto create_robots_str = [this](const std::string & base_name) {
       std::vector<std::string> namespaces;
       for (int i = 0; i < 16; ++i) {
-        auto ns = base_name + std::to_string(i);
+        const auto ns = (i < 10) ? (base_name + "0" + std::to_string(i)) : (base_name + std::to_string(i));
         namespaces.push_back(ns);
       }
       return namespaces;
