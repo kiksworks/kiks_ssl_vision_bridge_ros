@@ -43,13 +43,15 @@ MapPublisherNode::MapPublisherNode(
 MapPublisherNode::MapPublisherNode(rclcpp::Node::SharedPtr node)
 : RosNodeBase(std::move(node))
 {
+  // Parameter of map resolution
   this->add_parameter<double>(
     "map.resolution", 0.01, [this](const auto & param) {
       map_msg_.info.resolution = param.as_double();
     });
+  // Parameter of field and goal thickness
   this->add_parameter<double>(
     "map.wall_width", 0.02, [this](const auto & param) {map_wall_width_ = param.as_double();});
-
+  // Parameter of map frame_id
   const std::string ns = node_->get_namespace();
   const std::string ns_with_slash = ns.back() == '/' ? ns : ns + '/';
   this->add_parameter<std::string>(

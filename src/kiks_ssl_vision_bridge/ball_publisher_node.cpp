@@ -45,6 +45,7 @@ BallPublisherNode::BallPublisherNode(
 BallPublisherNode::BallPublisherNode(rclcpp::Node::SharedPtr node)
 : RosNodeBase(std::move(node))
 {
+  // Parameter of enabling　tf
   this->add_parameter<bool>(
     "tf.enable", false, [this](const auto & param) {
       if (param.as_bool()) {
@@ -53,7 +54,7 @@ BallPublisherNode::BallPublisherNode(rclcpp::Node::SharedPtr node)
         tf_broadcaster_.reset();
       }
     });
-
+  // Parameter of frame_id
   const std::string ns = node_->get_namespace();
   const std::string ns_with_slash = ns.back() == '/' ? ns : ns + '/';
   this->add_parameter<std::string>(
@@ -63,7 +64,7 @@ BallPublisherNode::BallPublisherNode(rclcpp::Node::SharedPtr node)
       node_->create_publisher<PointMsg>(ns_with_slash + str, this->get_dynamic_qos());
       tf_msg_.child_frame_id = str;
     });
-
+  // Parameter of map frame_id
   this->add_parameter<std::string>(
     "map.frame_id", "map", [this](const auto & param) {
       auto str = param.as_string();
@@ -75,6 +76,7 @@ BallPublisherNode::BallPublisherNode(rclcpp::Node::SharedPtr node)
 void BallPublisherNode::publish_ball(const TimeMsg & stamp, const SSL_DetectionBall & ball)
 {
   ball_msg_.header.stamp = stamp;
+  // The data from ssl-vision is in [mm], so multiply it by 0.001.
   ball_msg_.point.x = ball.x() * 0.001;
   ball_msg_.point.y = ball.y() * 0.001;
   ball_msg_.point.z = ball.z() * 0.001;
