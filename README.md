@@ -58,7 +58,7 @@ source ~/ros2_ws/install/setup.bash
 ```
 2. run
 ```
-ros2 run kiks_ssl_vision_bridge multi_robots_and_ball
+ros2 run kiks_ssl_vision_bridge ssl_vision_bridge
 ```
 
 ## Document
