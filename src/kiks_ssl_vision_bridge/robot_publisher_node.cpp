@@ -16,6 +16,8 @@
 
 #include "kiks_ssl_vision_bridge/robot_publisher_node.hpp"
 
+#include <cmath>
+
 namespace kiks::ssl_vision_bridge
 {
 
