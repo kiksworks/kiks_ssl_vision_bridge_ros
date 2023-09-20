@@ -29,12 +29,12 @@ default name : ssl_vision_bridge
 
 #### yellow_robots
 - Type : string array
-- Default : {"yellow0", "yellow1", ... , "yellow14", "yellow15"}
+- Default : {"yellow00", "yellow01", ... , "yellow14", "yellow15"}
 - Description : Yellow_team robots("" will result in an invalid robot)
 
 #### blue_robots
 - Type : string array
-- Default : {"bulue0", "bulue1", ... , "bulue14", "bulue15"}
+- Default : {"bulue00", "bulue01", ... , "bulue14", "bulue15"}
 - Description : Blue_team robots("" will result in an invalid robot)
 
 #### ball.enable
