@@ -17,9 +17,9 @@
 #ifndef KIKS_SSL_VISION_BRIDGE__RECEIVER_NODE_HPP_
 #define KIKS_SSL_VISION_BRIDGE__RECEIVER_NODE_HPP_
 
-#include <list>
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 #include "QNetworkInterface"
 #include "QUdpSocket"
@@ -57,7 +57,7 @@ private:
   QUdpSocket udp_socket_;
   QHostAddress udp_address_;
   QNetworkInterface udp_interface_;
-  std::list<RobotPublisherNode> yellow_robot_publisher_nodes_, blue_robot_publisher_nodes_;
+  std::unordered_map<std::uint32_t, RobotPublisherNode> yellow_robot_publisher_nodes_, blue_robot_publisher_nodes_;
   std::unique_ptr<BallPublisherNode> ball_publisher_node_;
   std::unique_ptr<MapPublisherNode> map_publisher_node_;
   rclcpp::TimerBase::SharedPtr receiving_admin_timer_;

@@ -43,9 +43,6 @@ RobotPublisherNode::RobotPublisherNode(
 RobotPublisherNode::RobotPublisherNode(rclcpp::Node::SharedPtr node)
 : RosNodeBase(std::move(node))
 {
-  // Parameter of robot_id
-  this->add_parameter<std::int64_t>(
-    "robot_id", 0, [this](const auto & param) {robot_id_ = param.as_int();});
   // Parameter of tf
   this->add_parameter<bool>(
     "tf.enable", false, [this](const auto & param) {
@@ -75,10 +72,6 @@ RobotPublisherNode::RobotPublisherNode(rclcpp::Node::SharedPtr node)
 
 void RobotPublisherNode::publish_robot(const TimeMsg & stamp, const SSL_DetectionRobot & robot)
 {
-  if (static_cast<decltype(robot_id_)>(robot.robot_id()) != robot_id_) {
-    return;
-  }
-
   pose_msg_.header.stamp = stamp;
   pose_msg_.pose.position.x = robot.x() * 0.001;
   pose_msg_.pose.position.y = robot.y() * 0.001;

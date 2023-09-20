@@ -54,7 +54,6 @@ private:
   using PoseMsg = geometry_msgs::msg::PoseStamped;
   using TfMsg = geometry_msgs::msg::TransformStamped;
 
-  int robot_id_;
   PoseMsg pose_msg_;
   TfMsg tf_msg_;
   rclcpp::Publisher<PoseMsg>::SharedPtr robot_publisher_;

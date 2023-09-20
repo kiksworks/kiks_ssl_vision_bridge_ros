@@ -73,28 +73,31 @@ ReceiverNode::ReceiverNode(rclcpp::Node::SharedPtr node)
     });
   // Parameter of each team robots
   // Default is {"teamcolor0, teamcolor1 ... "teamcolor14", "teamcolor15"} for each team
-  auto create_robots = [this](const std::string & base_name) {
+  auto create_robots_str = [this](const std::string & base_name) {
       std::vector<std::string> namespaces;
       for (int i = 0; i < 16; ++i) {
         auto ns = base_name + std::to_string(i);
         namespaces.push_back(ns);
-        this->add_parameter<std::int64_t>(ns + ".robot_id", i, [](const auto &) {});
       }
       return namespaces;
     };
-  this->add_parameter<std::vector<std::string>>(
-    "yellow_robots", create_robots("yellow"), [this](const auto & param) {
-      yellow_robot_publisher_nodes_.clear();
-      for (auto str : param.as_string_array()) {
-        yellow_robot_publisher_nodes_.emplace_back(node_->create_sub_node(str));
+  auto set_robots = [this](auto & robots, const std::vector<std::string> str_arr) {
+      robots.clear();
+      for(std::uint32_t i = 0; i < str_arr.size(); ++i) {
+        const auto& str = str_arr[i];
+        if(str == "") {
+          continue;
+        }
+        robots.emplace(i, node_->create_sub_node(str));
       }
+    };
+  this->add_parameter<std::vector<std::string>>(
+    "yellow_robots", create_robots_str("yellow"), [this, set_robots](const auto & param) {
+      set_robots(yellow_robot_publisher_nodes_, param.as_string_array());
     });
   this->add_parameter<std::vector<std::string>>(
-    "blue_robots", create_robots("blue"), [this](const auto & param) {
-      blue_robot_publisher_nodes_.clear();
-      for (auto str : param.as_string_array()) {
-        blue_robot_publisher_nodes_.emplace_back(node_->create_sub_node(str));
-      }
+    "blue_robots", create_robots_str("blue"), [this, set_robots](const auto & param) {
+      set_robots(blue_robot_publisher_nodes_, param.as_string_array());
     });
   // Parameter of ball publisher enable
   this->add_parameter<bool>(
@@ -156,9 +159,11 @@ void ReceiverNode::check_receiving()
       // Run all robot publishers
       const auto publish_robots = [&stamp](auto & nodes, const auto & robots) {
           for (const auto & robot : robots) {
-            for (auto & node : nodes) {
-              node.publish_robot(stamp, robot);
+            auto itr = nodes.find(robot.robot_id());
+            if(itr == nodes.end()) {
+              continue;
             }
+            itr->second.publish_robot(stamp, robot);
           }
         };
       publish_robots(yellow_robot_publisher_nodes_, detection.robots_yellow());
