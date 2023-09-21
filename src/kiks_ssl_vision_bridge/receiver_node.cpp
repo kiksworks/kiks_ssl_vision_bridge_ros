@@ -156,7 +156,7 @@ void ReceiverNode::check_receiving()
       // The time taken for ssl-vision processing is added to the current time.
       const std::uint64_t delay_ns = (detection.t_sent() - detection.t_capture()) *
         (0.001 * 0.001 * 0.001);
-      const TimeMsg stamp = now + std::chrono::nanoseconds(delay_ns);
+      const TimeMsg stamp = now - std::chrono::nanoseconds(delay_ns);
       // Run all robot publishers
       const auto publish_robots = [&stamp](auto & nodes, const auto & robots) {
           for (const auto & robot : robots) {
