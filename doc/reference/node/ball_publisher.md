@@ -27,7 +27,7 @@ note : This parameter is false by default to prevent communication between multi
 ## Related
 
 ### class
-- [ball_publisher_node](../class/robot_node.md)
+- [ball_publisher_node](../class/ball_publisher_node.md)
 
 ### node
 - [receiver](receiver.md)

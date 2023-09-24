@@ -50,7 +50,7 @@ default name : ssl_vision_bridge
 ## Related
 
 ### class
-- [receiver_node](../class/base_node.md)
+- [receiver_node](../class/receiver_node.md)
 
 ### node
 - [robot_publisher](robot_publisher.md)

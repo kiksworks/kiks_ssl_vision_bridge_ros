@@ -25,7 +25,7 @@ default name : ssl_bridge_vision_map_publisher
 ## Related
 
 ### class
-- [map_publisher_node](../class/map_node.md)
+- [map_publisher_node](../class/map_publisher_node.md)
 
 ### node
 - [receiver](receiver.md)

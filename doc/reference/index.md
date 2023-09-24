@@ -7,7 +7,7 @@
 - [robot_publisher_node](robot_publisher_node.md)
 - [ball_publisher_node](ball_publisher_node.md)
 - [map_publisher_node](map_publisher_node.md)
-- [receiver_node](map_publisher_node.md)
+- [receiver_node](receiver_node.md)
 
 ### node
 - [robot_publisher](node/robot_publisher.md)
