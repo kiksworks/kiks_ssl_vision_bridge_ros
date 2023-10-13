@@ -25,8 +25,12 @@ inline NodeExpander::SetParamsResultMsg NodeExpander::set_params(
   for (const auto & param : params) {
     const auto & name = param.get_name();
     const auto [begin, end] = param_setter_map_.equal_range(name);
+    if(begin == end) {
+      continue;
+    }
     bool this_param_successful = true;
-    for (auto itr = begin; itr != end; ++itr) {
+    auto itr = begin;
+    do {
       const auto error_handle =
         [this, &set_params_result_msg, &this_param_successful](const std::string & reason) {
           RCLCPP_ERROR(node_.get_logger(), "set_param : %s", reason.c_str());
@@ -47,7 +51,9 @@ inline NodeExpander::SetParamsResultMsg NodeExpander::set_params(
       } catch (...) {
         error_handle(name + " : unknown error");
       }
-    }
+      ++itr;
+    } while(itr != end);
+
     if (this_param_successful) {
       RCLCPP_INFO(
         node_.get_logger(), "succes to set param : %s : %s", name.c_str(),
