@@ -14,65 +14,65 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#include "kiks_ssl_vision_bridge/robot_publisher_node.hpp"
+#include "kiks_ssl_vision_bridge/robot_publisher_sub_node.hpp"
 
 #include <cmath>
 
 namespace kiks::ssl_vision_bridge
 {
 
-std::string RobotPublisherNode::default_name() {return "ssl_vision_bridge_robot_publisher";}
+std::string RobotPublisherSubNode::default_name() {return "ssl_vision_bridge_robot_publisher";}
 
-RobotPublisherNode::RobotPublisherNode(const rclcpp::NodeOptions & options)
-: RobotPublisherNode(std::make_shared<rclcpp::Node>(default_name(), options))
+RobotPublisherSubNode::RobotPublisherSubNode(const rclcpp::NodeOptions & options)
+: RobotPublisherSubNode(std::make_shared<rclcpp::Node>(default_name(), options))
 {
 }
 
-RobotPublisherNode::RobotPublisherNode(
+RobotPublisherSubNode::RobotPublisherSubNode(
   const std::string & node_name,
   const rclcpp::NodeOptions & options)
-: RobotPublisherNode(std::make_shared<rclcpp::Node>(node_name, options))
+: RobotPublisherSubNode(std::make_shared<rclcpp::Node>(node_name, options))
 {
 }
 
-RobotPublisherNode::RobotPublisherNode(
+RobotPublisherSubNode::RobotPublisherSubNode(
   const std::string & node_name, const std::string & node_namespace,
   const rclcpp::NodeOptions & options)
-: RobotPublisherNode(std::make_shared<rclcpp::Node>(node_name, node_namespace, options))
+: RobotPublisherSubNode(std::make_shared<rclcpp::Node>(node_name, node_namespace, options))
 {
 }
 
-RobotPublisherNode::RobotPublisherNode(rclcpp::Node::SharedPtr node)
-: RosNodeBase(std::move(node))
+RobotPublisherSubNode::RobotPublisherSubNode(rclcpp::Node::SharedPtr node)
+: ExpandedSubNode(std::move(node))
 {
   // Parameter of tf
-  this->add_parameter<bool>(
+  this->add_param<bool>(
     "tf.enable", false, [this](const auto & param) {
       if (param.as_bool()) {
-        tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*node_);
+        tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(**this);
       } else {
         tf_broadcaster_.reset();
       }
     });
   // Parameter of robot frame_id
   const auto tf_namespace =
-    node_->get_sub_namespace().empty() ? "" : node_->get_sub_namespace() + "/";
-  this->add_parameter<std::string>(
+    (*this)->get_sub_namespace().empty() ? "" : (*this)->get_sub_namespace() + "/";
+  this->add_param<std::string>(
     "robot.frame_id", "vision/base_footprint", [this, tf_namespace](const auto & param) {
       auto str = param.as_string();
       robot_publisher_ =
-      node_->create_publisher<PoseMsg>(str, this->get_dynamic_qos());
+      (*this)->create_publisher<PoseMsg>(str, this->get_dynamic_qos());
       tf_msg_.child_frame_id = tf_namespace + param.as_string();
     });
   // Parameter of map frame_id
-  this->add_parameter<std::string>(
+  this->add_param<std::string>(
     "map.frame_id", "map", [this](const auto & param) {
       auto str = param.as_string();
       pose_msg_.header.frame_id = tf_msg_.header.frame_id = param.as_string();
     });
 }
 
-void RobotPublisherNode::publish_robot(const TimeMsg & stamp, const SSL_DetectionRobot & robot)
+void RobotPublisherSubNode::publish_robot(const TimeMsg & stamp, const SSL_DetectionRobot & robot)
 {
   pose_msg_.header.stamp = stamp;
   pose_msg_.pose.position.x = robot.x() * 0.001;

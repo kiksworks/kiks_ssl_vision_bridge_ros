@@ -14,57 +14,57 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#include "kiks_ssl_vision_bridge/map_publisher_node.hpp"
+#include "kiks_ssl_vision_bridge/map_publisher_sub_node.hpp"
 
 #include <cmath>
 
 namespace kiks::ssl_vision_bridge
 {
 
-MapPublisherNode::MapPublisherNode(const rclcpp::NodeOptions & options)
-: MapPublisherNode(std::make_shared<rclcpp::Node>("ssl_vision_bridge_map_publisher", options))
+MapPublisherSubNode::MapPublisherSubNode(const rclcpp::NodeOptions & options)
+: MapPublisherSubNode(std::make_shared<rclcpp::Node>("ssl_vision_bridge_map_publisher", options))
 {
 }
 
-MapPublisherNode::MapPublisherNode(
+MapPublisherSubNode::MapPublisherSubNode(
   const std::string & node_name,
   const rclcpp::NodeOptions & options)
-: MapPublisherNode(std::make_shared<rclcpp::Node>(node_name, options))
+: MapPublisherSubNode(std::make_shared<rclcpp::Node>(node_name, options))
 {
 }
 
-MapPublisherNode::MapPublisherNode(
+MapPublisherSubNode::MapPublisherSubNode(
   const std::string & node_name, const std::string & node_namespace,
   const rclcpp::NodeOptions & options)
-: MapPublisherNode(std::make_shared<rclcpp::Node>(node_name, node_namespace, options))
+: MapPublisherSubNode(std::make_shared<rclcpp::Node>(node_name, node_namespace, options))
 {
 }
 
-MapPublisherNode::MapPublisherNode(rclcpp::Node::SharedPtr node)
-: RosNodeBase(std::move(node))
+MapPublisherSubNode::MapPublisherSubNode(rclcpp::Node::SharedPtr node)
+: ExpandedSubNode(std::move(node))
 {
   // Parameter of map resolution
-  this->add_parameter<double>(
+  this->add_param<double>(
     "map.resolution", 0.01, [this](const auto & param) {
       map_msg_.info.resolution = param.as_double();
     });
   // Parameter of field and goal thickness
-  this->add_parameter<double>(
+  this->add_param<double>(
     "map.wall_width", 0.02, [this](const auto & param) {map_wall_width_ = param.as_double();});
   // Parameter of map frame_id
-  const std::string ns = node_->get_namespace();
+  const std::string ns = (*this)->get_namespace();
   const std::string ns_with_slash = ns.back() == '/' ? ns : ns + '/';
-  this->add_parameter<std::string>(
+  this->add_param<std::string>(
     "map.frame_id", "map", [this, ns_with_slash](const auto & param) {
       const auto str = param.as_string();
       map_msg_.header.frame_id = str;
-      map_publisher_ = node_->create_publisher<MapMsg>(
+      map_publisher_ = (*this)->create_publisher<MapMsg>(
         ns_with_slash + str,
         this->get_dynamic_qos());
     });
 }
 
-void MapPublisherNode::publish_map(const TimeMsg & stamp, const SSL_GeometryFieldSize & field)
+void MapPublisherSubNode::publish_map(const TimeMsg & stamp, const SSL_GeometryFieldSize & field)
 {
   map_msg_.header.stamp = stamp;
   map_msg_.info.map_load_time = stamp;
@@ -98,7 +98,7 @@ void MapPublisherNode::publish_map(const TimeMsg & stamp, const SSL_GeometryFiel
 }
 
 template<typename ... Args>
-MapPublisherNode::MapDataItr MapPublisherNode::fill_map_lines(
+MapPublisherSubNode::MapDataItr MapPublisherSubNode::fill_map_lines(
   MapDataItr itr, int width, int height,
   Args... args)
 {
@@ -110,7 +110,7 @@ MapPublisherNode::MapDataItr MapPublisherNode::fill_map_lines(
 }
 
 template<typename ... Args>
-MapPublisherNode::MapDataItr MapPublisherNode::fill_map_lines_millor(
+MapPublisherSubNode::MapDataItr MapPublisherSubNode::fill_map_lines_millor(
   MapDataItr itr, int width, int height, Args... args)
 {
   auto itr_end = itr + height * width;
@@ -121,20 +121,20 @@ MapPublisherNode::MapDataItr MapPublisherNode::fill_map_lines_millor(
 }
 
 template<typename ... Args>
-MapPublisherNode::MapDataItr MapPublisherNode::fill_map_line(
+MapPublisherSubNode::MapDataItr MapPublisherSubNode::fill_map_line(
   MapDataItr itr, int width, int begin, int end, Args... args)
 {
   std::for_each(itr + begin, itr + end, [](auto & val) {val = 100;});
   return fill_map_line(itr, width, args ...);
 }
 
-MapPublisherNode::MapDataItr MapPublisherNode::fill_map_line(MapDataItr itr, int width)
+MapPublisherSubNode::MapDataItr MapPublisherSubNode::fill_map_line(MapDataItr itr, int width)
 {
   return itr + width;
 }
 
 template<typename ... Args>
-MapPublisherNode::MapDataItr MapPublisherNode::fill_map_line_millor(
+MapPublisherSubNode::MapDataItr MapPublisherSubNode::fill_map_line_millor(
   MapDataItr itr, int width, int begin, int end, Args... args)
 {
   std::for_each(itr + begin, itr + end, [](auto & val) {val = 100;});
@@ -142,7 +142,7 @@ MapPublisherNode::MapDataItr MapPublisherNode::fill_map_line_millor(
   return fill_map_line_millor(itr, width, args ...);
 }
 
-MapPublisherNode::MapDataItr MapPublisherNode::fill_map_line_millor(MapDataItr itr, int width)
+MapPublisherSubNode::MapDataItr MapPublisherSubNode::fill_map_line_millor(MapDataItr itr, int width)
 {
   return itr + width;
 }

@@ -22,7 +22,7 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::executors::SingleThreadedExecutor exec;
-  kiks::ssl_vision_bridge::ReceiverNode receiver_node;
+  auto receiver_node = std::make_shared<kiks::ssl_vision_bridge::ReceiverNode>();
   exec.add_node(receiver_node);
   exec.spin();
   rclcpp::shutdown();

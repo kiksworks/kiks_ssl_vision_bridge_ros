@@ -14,35 +14,35 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#ifndef KIKS_SSL_VISION_BRIDGE__MAP_PUBLISHER_NODE_HPP_
-#define KIKS_SSL_VISION_BRIDGE__MAP_PUBLISHER_NODE_HPP_
+#ifndef KIKS_SSL_VISION_BRIDGE__MAP_PUBLISHER_SUB_NODE_HPP_
+#define KIKS_SSL_VISION_BRIDGE__MAP_PUBLISHER_SUB_NODE_HPP_
 
 #include <string>
 #include <vector>
 
 #include "nav_msgs/msg/occupancy_grid.hpp"
 
-#include "kiks_ssl_vision_bridge/ros_node_base.hpp"
+#include "kiks_ssl_vision_bridge/expanded_sub_node.hpp"
 #include "messages_robocup_ssl_geometry.pb.h"
 
 namespace kiks::ssl_vision_bridge
 {
 
-class MapPublisherNode : public RosNodeBase
+class MapPublisherSubNode : public ExpandedSubNode
 {
 public:
   using TimeMsg = builtin_interfaces::msg::Time;
 
-  explicit MapPublisherNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
+  explicit MapPublisherSubNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
 
-  MapPublisherNode(
+  MapPublisherSubNode(
     const std::string & node_name, const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
 
-  MapPublisherNode(
+  MapPublisherSubNode(
     const std::string & node_name, const std::string & node_namespace,
     const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
 
-  explicit MapPublisherNode(rclcpp::Node::SharedPtr node);
+  explicit MapPublisherSubNode(rclcpp::Node::SharedPtr node);
 
   void publish_map(const TimeMsg & stamp, const SSL_GeometryFieldSize & field);
 
@@ -78,4 +78,4 @@ private:
 
 }  // namespace kiks::ssl_vision_bridge
 
-#endif  // KIKS_SSL_VISION_BRIDGE__MAP_PUBLISHER_NODE_HPP_
+#endif  // KIKS_SSL_VISION_BRIDGE__MAP_PUBLISHER_SUB_NODE_HPP_

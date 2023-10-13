@@ -24,16 +24,16 @@
 #include "QNetworkInterface"
 #include "QUdpSocket"
 
-#include "kiks_ssl_vision_bridge/ball_publisher_node.hpp"
-#include "kiks_ssl_vision_bridge/map_publisher_node.hpp"
-#include "kiks_ssl_vision_bridge/robot_publisher_node.hpp"
-#include "kiks_ssl_vision_bridge/ros_node_base.hpp"
+#include "kiks_ssl_vision_bridge/ball_publisher_sub_node.hpp"
+#include "kiks_ssl_vision_bridge/map_publisher_sub_node.hpp"
+#include "kiks_ssl_vision_bridge/robot_publisher_sub_node.hpp"
+#include "kiks_ssl_vision_bridge/expanded_node.hpp"
 #include "messages_robocup_ssl_wrapper.pb.h"
 
 namespace kiks::ssl_vision_bridge
 {
 
-class ReceiverNode : public RosNodeBase
+class ReceiverNode : public ExpandedNode
 {
 public:
   static std::string default_name();
@@ -57,10 +57,10 @@ private:
   QUdpSocket udp_socket_;
   QHostAddress udp_address_;
   QNetworkInterface udp_interface_;
-  std::unordered_map<std::uint32_t, RobotPublisherNode> yellow_robot_publisher_nodes_,
-    blue_robot_publisher_nodes_;
-  std::unique_ptr<BallPublisherNode> ball_publisher_node_;
-  std::unique_ptr<MapPublisherNode> map_publisher_node_;
+  std::unordered_map<std::uint32_t, RobotPublisherSubNode> yellow_robot_publisher_sub_nodes_,
+    blue_robot_publisher_sub_nodes_;
+  std::unique_ptr<BallPublisherSubNode> ball_publisher_sub_node_;
+  std::unique_ptr<MapPublisherSubNode> map_publisher_sub_node_;
   rclcpp::TimerBase::SharedPtr receiving_admin_timer_;
 };
 

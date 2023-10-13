@@ -14,52 +14,52 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#ifndef KIKS_SSL_VISION_BRIDGE__ROBOT_PUBLISHER_NODE_HPP_
-#define KIKS_SSL_VISION_BRIDGE__ROBOT_PUBLISHER_NODE_HPP_
+#ifndef KIKS_SSL_VISION_BRIDGE__BALL_PUBLISHER_SUB_NODE_HPP_
+#define KIKS_SSL_VISION_BRIDGE__BALL_PUBLISHER_SUB_NODE_HPP_
 
 #include <memory>
 #include <string>
 
-#include "geometry_msgs/msg/pose_stamped.hpp"
+#include "geometry_msgs/msg/point_stamped.hpp"
 #include "geometry_msgs/msg/transform_stamped.hpp"
 #include "tf2_ros/transform_broadcaster.h"
 
-#include "kiks_ssl_vision_bridge/ros_node_base.hpp"
+#include "kiks_ssl_vision_bridge/expanded_sub_node.hpp"
 #include "messages_robocup_ssl_detection.pb.h"
 
 namespace kiks::ssl_vision_bridge
 {
 
-class RobotPublisherNode : public RosNodeBase
+class BallPublisherSubNode : public ExpandedSubNode
 {
 public:
   using TimeMsg = builtin_interfaces::msg::Time;
 
   static inline std::string default_name();
 
-  explicit RobotPublisherNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
+  explicit BallPublisherSubNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
 
-  RobotPublisherNode(
+  BallPublisherSubNode(
     const std::string & node_name, const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
 
-  RobotPublisherNode(
+  BallPublisherSubNode(
     const std::string & node_name, const std::string & node_namespace,
     const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
 
-  explicit RobotPublisherNode(rclcpp::Node::SharedPtr node);
+  explicit BallPublisherSubNode(rclcpp::Node::SharedPtr node);
 
-  void publish_robot(const TimeMsg & stamp, const SSL_DetectionRobot & robot);
+  void publish_ball(const TimeMsg & stamp, const SSL_DetectionBall & ball);
 
 private:
-  using PoseMsg = geometry_msgs::msg::PoseStamped;
+  using PointMsg = geometry_msgs::msg::PointStamped;
   using TfMsg = geometry_msgs::msg::TransformStamped;
 
-  PoseMsg pose_msg_;
+  PointMsg ball_msg_;
   TfMsg tf_msg_;
-  rclcpp::Publisher<PoseMsg>::SharedPtr robot_publisher_;
+  rclcpp::Publisher<PointMsg>::SharedPtr ball_publisher_;
   std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
 };
 
 }  // namespace kiks::ssl_vision_bridge
 
-#endif  // KIKS_SSL_VISION_BRIDGE__ROBOT_PUBLISHER_NODE_HPP_
+#endif  // KIKS_SSL_VISION_BRIDGE__BALL_PUBLISHER_SUB_NODE_HPP_

@@ -14,58 +14,58 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#include "kiks_ssl_vision_bridge/ball_publisher_node.hpp"
+#include "kiks_ssl_vision_bridge/ball_publisher_sub_node.hpp"
 
 #include <string>
 
 namespace kiks::ssl_vision_bridge
 {
 
-std::string BallPublisherNode::default_name() {return "ssl_vision_bridge_ball_publisher";}
+std::string BallPublisherSubNode::default_name() {return "ssl_vision_bridge_ball_publisher";}
 
-BallPublisherNode::BallPublisherNode(const rclcpp::NodeOptions & options)
-: BallPublisherNode(std::make_shared<rclcpp::Node>(default_name(), options))
+BallPublisherSubNode::BallPublisherSubNode(const rclcpp::NodeOptions & options)
+: BallPublisherSubNode(std::make_shared<rclcpp::Node>(default_name(), options))
 {
 }
 
-BallPublisherNode::BallPublisherNode(
+BallPublisherSubNode::BallPublisherSubNode(
   const std::string & node_name,
   const rclcpp::NodeOptions & options)
-: BallPublisherNode(std::make_shared<rclcpp::Node>(node_name, options))
+: BallPublisherSubNode(std::make_shared<rclcpp::Node>(node_name, options))
 {
 }
 
-BallPublisherNode::BallPublisherNode(
+BallPublisherSubNode::BallPublisherSubNode(
   const std::string & node_name, const std::string & node_namespace,
   const rclcpp::NodeOptions & options)
-: BallPublisherNode(std::make_shared<rclcpp::Node>(node_name, node_namespace, options))
+: BallPublisherSubNode(std::make_shared<rclcpp::Node>(node_name, node_namespace, options))
 {
 }
 
-BallPublisherNode::BallPublisherNode(rclcpp::Node::SharedPtr node)
-: RosNodeBase(std::move(node))
+BallPublisherSubNode::BallPublisherSubNode(rclcpp::Node::SharedPtr node)
+: ExpandedSubNode(std::move(node))
 {
   // Parameter of enabling　tf
-  this->add_parameter<bool>(
+  this->add_param<bool>(
     "tf.enable", false, [this](const auto & param) {
       if (param.as_bool()) {
-        tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*node_);
+        tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(**this);
       } else {
         tf_broadcaster_.reset();
       }
     });
   // Parameter of frame_id
-  const std::string ns = node_->get_namespace();
+  const std::string ns = (*this)->get_namespace();
   const std::string ns_with_slash = ns.back() == '/' ? ns : ns + '/';
-  this->add_parameter<std::string>(
+  this->add_param<std::string>(
     "ball.frame_id", "vision/ball", [this, ns_with_slash](const auto & param) {
       auto str = param.as_string();
       ball_publisher_ =
-      node_->create_publisher<PointMsg>(ns_with_slash + str, this->get_dynamic_qos());
+      (*this)->create_publisher<PointMsg>(ns_with_slash + str, this->get_dynamic_qos());
       tf_msg_.child_frame_id = str;
     });
   // Parameter of map frame_id
-  this->add_parameter<std::string>(
+  this->add_param<std::string>(
     "map.frame_id", "map", [this](const auto & param) {
       auto str = param.as_string();
       ball_msg_.header.frame_id = str;
@@ -73,7 +73,7 @@ BallPublisherNode::BallPublisherNode(rclcpp::Node::SharedPtr node)
     });
 }
 
-void BallPublisherNode::publish_ball(const TimeMsg & stamp, const SSL_DetectionBall & ball)
+void BallPublisherSubNode::publish_ball(const TimeMsg & stamp, const SSL_DetectionBall & ball)
 {
   ball_msg_.header.stamp = stamp;
   // The data from ssl-vision is in [mm], so multiply it by 0.001.
