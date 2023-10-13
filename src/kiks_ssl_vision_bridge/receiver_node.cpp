@@ -81,10 +81,12 @@ ReceiverNode::ReceiverNode(
       robots.clear();
       for (std::uint32_t i = 0; i < str_arr.size(); ++i) {
         const auto & str = str_arr[i];
-        if (str == "") {
-          continue;
+        if (str == "/") {
+          robots.emplace(i, this->shared_from_this());
         }
-        robots.emplace(i, this->create_sub_node(str));
+        else if(str != "") {
+          robots.emplace(i, this->create_sub_node(str));
+        }
       }
     };
   this->add_param<std::vector<std::string>>(
