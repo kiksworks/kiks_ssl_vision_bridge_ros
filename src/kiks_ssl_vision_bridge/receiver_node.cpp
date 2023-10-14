@@ -83,19 +83,26 @@ ReceiverNode::ReceiverNode(
         const auto & str = str_arr[i];
         if (str == "/") {
           robots.emplace(i, this->shared_from_this());
-        }
-        else if(str != "") {
+        } else if (str != "") {
           robots.emplace(i, this->create_sub_node(str));
         }
       }
     };
   this->add_param<std::vector<std::string>>(
     "yellow_robots", create_robots_str("yellow"), [this, set_robots](const auto & param) {
-      set_robots(yellow_robot_publisher_sub_nodes_, param.as_string_array());
+      yellow_robots_setter_ = this->create_wall_timer(
+        0s, [this, set_robots, param]() {
+          set_robots(yellow_robot_publisher_sub_nodes_, param.as_string_array());
+          yellow_robots_setter_.reset();
+        });
     });
   this->add_param<std::vector<std::string>>(
     "blue_robots", create_robots_str("blue"), [this, set_robots](const auto & param) {
-      set_robots(blue_robot_publisher_sub_nodes_, param.as_string_array());
+      blue_robots_setter_ = this->create_wall_timer(
+        0s, [this, set_robots, param]() {
+          set_robots(blue_robot_publisher_sub_nodes_, param.as_string_array());
+          blue_robots_setter_.reset();
+        });
     });
   // Parameter of ball publisher enable
   this->add_param<bool>(

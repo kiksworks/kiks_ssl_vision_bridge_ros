@@ -25,7 +25,7 @@ inline NodeExpander::SetParamsResultMsg NodeExpander::set_params(
   for (const auto & param : params) {
     const auto & name = param.get_name();
     const auto [begin, end] = param_setter_map_.equal_range(name);
-    if(begin == end) {
+    if (begin == end) {
       continue;
     }
     bool this_param_successful = true;

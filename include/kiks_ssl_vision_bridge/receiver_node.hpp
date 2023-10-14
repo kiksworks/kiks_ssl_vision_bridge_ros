@@ -61,7 +61,7 @@ private:
     blue_robot_publisher_sub_nodes_;
   std::unique_ptr<BallPublisherSubNode> ball_publisher_sub_node_;
   std::unique_ptr<MapPublisherSubNode> map_publisher_sub_node_;
-  rclcpp::TimerBase::SharedPtr receiving_admin_timer_;
+  rclcpp::TimerBase::SharedPtr receiving_admin_timer_, yellow_robots_setter_, blue_robots_setter_;
 };
 
 }  // namespace kiks::ssl_vision_bridge
