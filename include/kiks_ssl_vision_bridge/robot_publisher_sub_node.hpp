@@ -20,7 +20,7 @@
 #include <memory>
 #include <string>
 
-#include "geometry_msgs/msg/pose_stamped.hpp"
+#include "geometry_msgs/msg/pose_with_covariance_stamped.hpp"
 #include "geometry_msgs/msg/transform_stamped.hpp"
 #include "tf2_ros/transform_broadcaster.h"
 
@@ -51,7 +51,7 @@ public:
   void publish_robot(const TimeMsg & stamp, const SSL_DetectionRobot & robot);
 
 private:
-  using PoseMsg = geometry_msgs::msg::PoseStamped;
+  using PoseMsg = geometry_msgs::msg::PoseWithCovarianceStamped;
   using TfMsg = geometry_msgs::msg::TransformStamped;
 
   PoseMsg pose_msg_;

@@ -75,22 +75,22 @@ RobotPublisherSubNode::RobotPublisherSubNode(rclcpp::Node::SharedPtr node)
 void RobotPublisherSubNode::publish_robot(const TimeMsg & stamp, const SSL_DetectionRobot & robot)
 {
   pose_msg_.header.stamp = stamp;
-  pose_msg_.pose.position.x = robot.x() * 0.001;
-  pose_msg_.pose.position.y = robot.y() * 0.001;
+  pose_msg_.pose.pose.position.x = robot.x() * 0.001;
+  pose_msg_.pose.pose.position.y = robot.y() * 0.001;
   // Quaternion calculations
   // - Since the rotation vector vector is (0, 0, 1), it becomes
   //   x=0 y=0 z=sin(orientation/2) w=cos(orientation/2)
   const auto theta = robot.orientation() * 0.5;
-  pose_msg_.pose.orientation.z = std::sin(theta);
-  pose_msg_.pose.orientation.w = std::cos(theta);
+  pose_msg_.pose.pose.orientation.z = std::sin(theta);
+  pose_msg_.pose.pose.orientation.w = std::cos(theta);
   robot_publisher_->publish(pose_msg_);
 
   if (tf_broadcaster_) {
     tf_msg_.header.stamp = stamp;
-    tf_msg_.transform.translation.x = pose_msg_.pose.position.x;
-    tf_msg_.transform.translation.y = pose_msg_.pose.position.y;
-    tf_msg_.transform.rotation.z = pose_msg_.pose.orientation.z;
-    tf_msg_.transform.rotation.w = pose_msg_.pose.orientation.w;
+    tf_msg_.transform.translation.x = pose_msg_.pose.pose.position.x;
+    tf_msg_.transform.translation.y = pose_msg_.pose.pose.position.y;
+    tf_msg_.transform.rotation.z = pose_msg_.pose.pose.orientation.z;
+    tf_msg_.transform.rotation.w = pose_msg_.pose.pose.orientation.w;
     tf_broadcaster_->sendTransform(tf_msg_);
   }
 }
