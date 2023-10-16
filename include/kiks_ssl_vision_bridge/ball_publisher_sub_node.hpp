@@ -20,7 +20,7 @@
 #include <memory>
 #include <string>
 
-#include "geometry_msgs/msg/point_with_covariance_stamped.hpp"
+#include "geometry_msgs/msg/point_stamped.hpp"
 #include "geometry_msgs/msg/transform_stamped.hpp"
 #include "tf2_ros/transform_broadcaster.h"
 
