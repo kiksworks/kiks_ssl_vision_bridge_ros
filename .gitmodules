@@ -1,0 +1,3 @@
+[submodule "3rd/ssl-vision"]
+	path = 3rd/ssl-vision
+	url = https://github.com/RoboCup-SSL/ssl-vision.git
